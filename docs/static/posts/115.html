@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #115</title>
+  <meta name="description" content=" TTS-1 Technical Report. 2/2   Продолжаем рассказ о  техрепотре  свежего TTS-движка американского стартапа Inworld.    SFT: что сработало, а что нет   После pretrain-стадии авторы переходят к SFT и ал" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/115.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #115" />
+  <meta property="og:description" content=" TTS-1 Technical Report. 2/2   Продолжаем рассказ о  техрепотре  свежего TTS-движка американского стартапа Inworld.    SFT: что сработало, а что нет   После pretrain-стадии авторы переходят к SFT и ал" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/115_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-01-28T10:02:21+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/115_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=115" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="115">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-01-28T10:02:21+00:00">2026-01-28 10:02 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>TTS-1 Technical Report. 2/2<br></strong><br>Продолжаем рассказ о <a href="https://arxiv.org/abs/2507.21138v1" rel="nofollow noopener noreferrer">техрепотре</a> свежего TTS-движка американского стартапа Inworld. <br><br><strong>SFT: что сработало, а что нет<br></strong><br>После pretrain-стадии авторы переходят к SFT и алайнменту. На SFT используют около 200 тысяч часов транскрибированных данных. Для фильтрации отбрасывают 20% худших сэмплов по DNS-MOS, 5% самых быстрых и 5% самых медленных по символам в секунду, плюс применяются текстовые эвристики для удаления плохих транскрипций.<br><br>Авторы утверждают, что для качества синтеза было важно инициализировать learning rate для SFT финальным значением после стадии pretrain. Попытка подмешать text-based instruction-following данные, чтобы лучше понимать сложные промпты, привела к ухудшению стабильности синтеза, несмотря на отсутствие деградации лосса на аудиоданных. Ещё в работе есть аблейшн, который показал, что стартовать SFT с speech-pretrained LM заметно лучше, чем с LLaMA-3.2-1B-Instruct — и лоссу, и по метрикам WER и SIM.<br><br><strong>RL-алайнмент и разметка стилей<br></strong><br>Для алайнмента используют RL с GRPO, так как даже после SFT остаются клики, артефакты и ошибки произношения. GRPO позволяет оценивать несколько ответов на один и тот же запрос относительно среднего по группе, что даёт более стабильное обучение. Используется композитный реворд, включающий WER, similarity и DNS-MOS, а также отдельные награды для аудиотегов. WER считают с помощью Whisper-large-v3, similarity — через WavLM-Large. Утверждают, что единая модель с композитным ревордом работает лучше, чем модели, обученные под каждую метрику отдельно. В качестве аргумента приводят только графики GRPO. <br><br>Отдельный блок отведён стилям и невербальным эффектам. Попытка просто конкатенировать style-tag и текст не сработала — авторы объясняют это тем, что кодек смешивает семантическое и акустическое пространства, и стиль сложно изолировать от голосовых характеристик. Решением стал парный датасет: нейтральные и стилизованные высказывания одного и того же спикера, склеенные паузой 0,5–1,5 секунды, с использованием тега как разделителя. На один нейтральный сэмпл приходится от одного до пяти стилизованных, около 20% данных содержат невербальные вокализации, а примерно 30% — непарные нейтральные примеры для сохранения базового синтеза.<br><br>В оценке качества приходят к тому, что увеличение размера модели улучшает similarity и стабилизирует WER, а RL-алайнмент даёт прирост на коротких, средних и длинных сэмплах. Что интересно, на внутренней TTS-арене побеждают всех конкурентов, например, TTS-1-Max имеет win-rate 59,1% против 11Labs.<br><br><strong>Инференс<br></strong><br>Модели имеют два режима: мгновенный voice cloning по референсу и транскрипту и профессиональный voice cloning с LoRA-дообучением SpeechLM. Для стриминга сделана аккуратная склейка сегментов по участкам тишины, чтобы избежать щелчков, а также стабилизация громкости за счёт дополнительного контекста в аудиодекодере. Inworld вместе с Inference платформой Modular ускорил API за счёт асинхронного планировщика, батчинга в декодере, sparse-формата для penalty sampling и кастомных GPU-ядер на Mojo в составе MAX pipeline. Это даёт первые две секунды синтезированного аудио в среднем на 70% быстрее, чем через vLLM.<br><br><strong>Какие есть проблемы<br></strong><br>В конце авторы честно говорят и об ограничениях. Кэширование референса помогает снизить задержки, но может подтягивать стиль и эмоции из референсного аудио. Длинные последовательности хуже генерируются при коротких промптах, а параметры декодинга постоянно приходится балансировать между сходством с голосом и выразительностью. В целом, получилась довольно инженерная работа о том, как стартап оптимизирует качество, задержки и стоимость — без архитектурных откровений, но с массой практических деталей.<br><br><em>Владимир Гогорян</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/115_480.webp" srcset="../../assets/media/thumbs/115_480.webp 480w, ../../assets/media/115.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="115" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/116_480.webp" srcset="../../assets/media/thumbs/116_480.webp 480w, ../../assets/media/116.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="115" data-image-index="1" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/117_480.webp" srcset="../../assets/media/thumbs/117_480.webp 480w, ../../assets/media/117.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="115" data-image-index="2" /></div></div>
+      <div class="actions">
+        <span>288 просмотров · 19 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/115" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./115.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./112.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 115, "media": [{"kind": "photo", "path": "../../assets/media/115.jpg", "thumb": "../../assets/media/thumbs/115_480.webp", "size": 91492, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/116.jpg", "thumb": "../../assets/media/thumbs/116_480.webp", "size": 58690, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/117.jpg", "thumb": "../../assets/media/thumbs/117_480.webp", "size": 71366, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-03T14:58:39Z", "posts_count": 56, "last_seen_message_id": 117, "stats": {"new": 113, "updated": 0, "media_downloaded": 98}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>

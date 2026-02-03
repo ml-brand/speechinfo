@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #37</title>
+  <meta name="description" content=" Moshi в деталях: новая архитектура диалоговой системы в реальном времени. Часть 2/2    Продолжаем разбирать  Moshi  — диалоговую систему, которая совмещает распознавание, чат-бота и синтез речи в одн" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/37.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #37" />
+  <meta property="og:description" content=" Moshi в деталях: новая архитектура диалоговой системы в реальном времени. Часть 2/2    Продолжаем разбирать  Moshi  — диалоговую систему, которая совмещает распознавание, чат-бота и синтез речи в одн" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/37_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2025-05-27T08:05:48+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/37_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../page-2.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../page-2.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=37" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="37">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2025-05-27T08:05:48+00:00">2025-05-27 08:05 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Moshi в деталях: новая архитектура диалоговой системы в реальном времени. Часть 2/2 </strong><br><br>Продолжаем разбирать <a href="https://arxiv.org/abs/2410.00037" rel="nofollow noopener noreferrer">Moshi </a>— диалоговую систему, которая совмещает распознавание, чат-бота и синтез речи в одной модели. В первой части речь шла о LLM Helium и аудиокодеке Mimi. Здесь — о том, как устроена сама Moshi и как работает механизм переключения между «слушать» и «говорить».<br><br><strong>Moshi </strong><br><br>На следующем этапе авторы хотят научить текстовую LLM Helium аудиомодальности, а конкретно — предсказывать токены от Mimi. Да ещё и так, чтобы модель не потеряла свои LLM-ные знания.<br><br>Наша задача — предсказывать матрицу из токенов с размерностями времени на 8 кодеков. Для этого модель Moshi состоит из двух трансформеров: Temporal Transformer и Depth Transformer.<br><br>Temporal Transformer — это большой трансформер, проинициализированный весами Helium. Он будет авторегрессивно идти по размерности времени и генерировать эмбеддинг для каждого тика времени. Depth Transformer инициализируется шумом. Его задача — на каждом шаге Temporal Transformer-a закондишениться на сгенерированный эмбеддинг и развернуть его в 8 Mimi-токенов.<br><br>Учиться вся эта конструкция будет в три этапа. Тут опускаем много подробностей, но идея примерно такая:<br><br>1. Учимся на огромном, шумном audio-only датасете. На этом этапе моделька познаёт аудиомодальность и пытается соотнести её с текстовой модальностью.<br><br>2. Учимся на синтетических диалоговых данных. Здесь модель учиться слушать и слышать одновременно, подстраивается под диалоговый формат (так называемый full-duplex-режим).<br><br>3. Тюнимся на более качественном диалоговом датасете. Модель обретает свой голос и выучивает более осознанные диалоговые ответы.<br><br>Важнейшая фича Moshi — full-duplex: способность модели одновременно слушать и говорить. С ней диалог получается плавнее и человечнее, в нём могут быть одновременные реплики, перебивания и междометия. Модель достигает режима full-duplex с помощью алгоритма Inner Monologue.<br><br><strong>Inner-monologue</strong><br><strong><br></strong>Для начала, мы хотим сделать так, чтобы одно и то же слово, представленное в виде текстовых токенов и в виде аудиотокенов, занимало одно и то же количество токенов. Для этого авторы взяли датасет и модель WhisperV3 и сделали алайнмент. То есть для каждого слова в тексте нашли время, когда оно начинает и заканчивает произноситься. После этого авторы взяли специальные паддинг-токены и в текстовой модальности добавили их после каждого слова — столько, чтобы по длине они совпадали с количеством токенов, которое занимает это слово в аудиомодальности.<br><br>Дальше мы хотим учить модельку на этих данных. Тут полезно посмотреть на картинку.<br><br>— Мы хотим, чтобы в каждый момент времени наша моделька работала с тремя стримами информации: аудио, которое произносит пользователь (8 токенов), аудио, которое произносит Moshi (8 токенов), и текст, разбавленный паддингами, который произносит Moshi (1 токен). На картинке они показаны сверху вниз.<br><br>— Мы хотим все три стрима подавать на вход к модельке. Соответственно для каждого стрима токенов будет своя матрица эмбеддингов, которые  в итоге складываются.<br><br>— На выход мы хотим получать только текст и аудио реплик. На картинке — это оранжево-жёлто-зелёные (каждый цвет — отдельное слово) токены. Текст предсказывает линейная голова поверх Temporal Transformer, а для аудиотокенов есть Depth Transformer.<br><br>— В такой парадигме моделька учится и инферится.<br><br>Moshi вышла 7 месяцев назад и, кажется, уже потихоньку устаревает. Если попользоваться демкой, сначала она приводит в восхищение, но потом становятся заметны косяки: модель говорит глупости, неуместно перебивает, начинает отвечать с большой задержкой. Она ощутимо слабее, чем, например, VoiceMode от OpenAI. Но у ребят подробная статья, много интересных выводов и экспериментов, а также выложенный в открытый доступ кодек. Это довольно большой вклад в область.<br><br><em>Роман Кайль</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em> <em>Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/37_480.webp" srcset="../../assets/media/thumbs/37_480.webp 480w, ../../assets/media/37.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="37" data-image-index="0" /></div></div>
+      <div class="actions">
+        <span>820 просмотров · 25 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/37" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../page-2.html">К списку постов</a> · <a href="./37.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link" href="./38.html" style="visibility:visible">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./36.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 37, "media": [{"kind": "photo", "path": "../../assets/media/37.jpg", "thumb": "../../assets/media/thumbs/37_480.webp", "size": 113182, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-03T14:58:39Z", "posts_count": 56, "last_seen_message_id": 117, "stats": {"new": 113, "updated": 0, "media_downloaded": 98}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>

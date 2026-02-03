@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #100</title>
+  <meta name="description" content=" OmniVinci: Enhancing Architecture and Data for Omni-Modal Understanding LLM [2/2]   Во второй части обзора  статьи  мы подробно поговорим о тренировке модели и разберём разницу между implicit и expli" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/100.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #100" />
+  <meta property="og:description" content=" OmniVinci: Enhancing Architecture and Data for Omni-Modal Understanding LLM [2/2]   Во второй части обзора  статьи  мы подробно поговорим о тренировке модели и разберём разницу между implicit и expli" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/100_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2025-11-27T08:17:01+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/100_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=100" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="100">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2025-11-27T08:17:01+00:00">2025-11-27 08:17 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>OmniVinci: Enhancing Architecture and Data for Omni-Modal Understanding LLM [2/2]</strong><br><br>Во второй части обзора <a href="https://arxiv.org/abs/2510.15870v2" rel="nofollow noopener noreferrer">статьи</a> мы подробно поговорим о тренировке модели и разберём разницу между implicit и explicit learning.<br><br><strong>Обучение модели</strong><br><br>Обучение модели можно разделить на два больших этапа — modality-specific и omni-modal части соответственно, LLM-backbone при этом берётся предобученная (авторы используют Qwen2.5-7B-Instruct).<br><br>Обучение vision-модулей состоит из следующих стадий:<br><br>- Stage 1: Vision Projector Alignment — учится только vision-проектор, решается задача генерации простых описаний.<br>- Stage 2: Vision Encoder Alignment — учатся vision-энкодер и vision-проектор.<br>- Stage 3: Vision Pre-training — core-стадия, vision-энкодер заморожен, цель — finetune vision-проектора и LLM. Используются мультимодальные данные, модель учится интерпретировать и генерировать подписи к картинкам.<br>- Stage 4: Image Instruction Tuning — finetune модели на задачи vision instruction following: ответы на общие и knowledge-based-вопросы, генерация сложных подписей, logical и vision reasoning, интерпретация документов, обработка диаграмм, etc. Учатся все модули.<br>- Stage 5: Video Instruction Tuning — финальная стадия, все части модели учатся на задачу понимания видео (распознавание активности (activity recognition); трекинг объекта во времени (по фреймам), time-sensitive QA). Цель —  получить у модели способность к temporal reasoning. <br><br>После vision-этапа авторы получают «vision preliminary checkpoint» — достаточно хорошо обученные на vision-задачи энкодер, проектор и LLM. <br><br>Обучение аудиомодулей делится на две стадии:<br><br>- Stage 1: Audio Projector &amp; Encoder Alignment. Параметры LLM и vision-части заморожены, учимся на задачи audio-based QA, captioning, ASR. Цель — обучить проектор аудиопредставлениям, согласованным с семантическим пространством языковой модели.<br>- Stage 2: Audio Instruction Tuning: параметры LLM не заморожены, LLM учится вместе с аудиоэнкодером и аудиопроектором. Учимся на все те же задачи + на задачу перевода речи; идея стадии в том, что разнообразные аудиальные задачи при обученном проекторе помогут аудиоэнкодеру выучить и низкоуровневые акустические признаки, и высокоуровневые семантические представления. <br><br><strong>Omni-Modal Joint Training </strong><br><strong><br></strong>Во время мультимодального этапа обучения vision- и аудиоэнкодеры заморожены, учатся все остальные модули (OmniAlignNet, проекторы и LLM). В статье описываются два подхода: implicit и explicit learning. Implicit learning использует существующие датасеты Video QA, где модель неявно учится интегрировать обе модальности, не получая однозначной информации о том, какая часть ответа взята из видеоряда, а какая — из звука. Explicit learning использует синтетические данные, в которых указывается взаимосвязь между модальностями. Главная разработка авторов — data engine, генерирующий отдельные описания для видео и аудио, а затем использующий LLM с ризонингом (Deepseek R1) для создания объединенных подписей, указывающих на то, как визуальная и аудиальная информация дополняют друг друга. Проблема, которую решает этот подход — устранение «modality-specific hallucination» (fig 1). Ключевой вывод мультимодальной стадии: описание видео, основанное на одной модальности, часто неточно; интеграция обеих модальностей критична, и explicit learning эффективно решает эту задачу (fig 2).<strong><br></strong><br>Финальная стадия обучения включает RL с использованием GRPO. Важный результат: GRPO на audio-visual-данных сходится быстрее и качественнее, чем на чисто визуальных, что подтверждает ценность мультимодального подхода (fig 3).<br><br><strong>Заключение</strong><br><br>В статье OmniVinci представлен комплексный подход к созданию мультимодальных языковых моделей, включающий архитектурные инновации и продуманную стратегию обучения с разделением на modality-specific- и omni-modal-этапы. Ключевой вклад — систематическое исследование подходов к мультимодальному обучению. Авторы демонстрируют, что explicit learning с синтетическими данными эффективнее решает проблему modality-specific hallucination и улучшает общее качество модели.<br><br><em>Екатерина Козлова</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/100_480.webp" srcset="../../assets/media/thumbs/100_480.webp 480w, ../../assets/media/100.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="100" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/101_480.webp" srcset="../../assets/media/thumbs/101_480.webp 480w, ../../assets/media/101.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="100" data-image-index="1" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/102_480.webp" srcset="../../assets/media/thumbs/102_480.webp 480w, ../../assets/media/102.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="100" data-image-index="2" /></div></div>
+      <div class="actions">
+        <span>600 просмотров · 18 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/100" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./100.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link" href="./103.html" style="visibility:visible">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./97.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 100, "media": [{"kind": "photo", "path": "../../assets/media/100.jpg", "thumb": "../../assets/media/thumbs/100_480.webp", "size": 116831, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/101.jpg", "thumb": "../../assets/media/thumbs/101_480.webp", "size": 50256, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/102.jpg", "thumb": "../../assets/media/thumbs/102_480.webp", "size": 99872, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-03T14:58:39Z", "posts_count": 56, "last_seen_message_id": 117, "stats": {"new": 113, "updated": 0, "media_downloaded": 98}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>

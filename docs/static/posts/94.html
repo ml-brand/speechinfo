@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #94</title>
+  <meta name="description" content=" Qwen3-Omni Technical Report [2/2]     Продолжаем разбор  техрепорта  Qwen3-Omni. В первой части  рассказали  об архитектурных отличиях от Qwen2.5-Omni.  В генерации аудио также произошли изменения. П" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/94.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #94" />
+  <meta property="og:description" content=" Qwen3-Omni Technical Report [2/2]     Продолжаем разбор  техрепорта  Qwen3-Omni. В первой части  рассказали  об архитектурных отличиях от Qwen2.5-Omni.  В генерации аудио также произошли изменения. П" />
+  
+  <meta property="article:published_time" content="2025-11-06T12:20:15+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary" />
+  
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=94" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="94">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2025-11-06T12:20:15+00:00">2025-11-06 12:20 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Qwen3-Omni Technical Report [2/2]</strong><br><strong><br></strong>Продолжаем разбор <a href="https://arxiv.org/html/2509.17765v1" rel="nofollow noopener noreferrer">техрепорта</a> Qwen3-Omni. В первой части <a href="https://t.me/speechinfo/93" rel="nofollow noopener noreferrer">рассказали</a> об архитектурных отличиях от Qwen2.5-Omni.<br><br>В генерации аудио также произошли изменения. Помимо Talker, используются ещё две модели: MTP-модуль (авторегрессионная dense-модель размером 80М) и Code2Wav (декодер для кодеков, сверточная модель размером 200М), которые работают с RVQ-токенами (Residual Vector Quantization). Схема работы следующая:<br><br>- Поверх Talker есть линейный слой, который предсказывает нулевой кодбук.<br>- С помощью MTP-модели, вместо того, чтобы предсказывать оставшиеся RVQ-токены последовательно, предсказываются сразу все — по аналогии с multi token prediction (такой подход используется, например, в Deepseek).<br>- Полученные RVQ-токены подаются в модель Code2Wav, которая преобразует их в вейвформу. Этот подход эффективнее, чем в Qwen2.5-Omni, где использовались трансформерные модели для отображения в мел-спектрограмму и только затем — в вейвформу.<br><br>Как и в случае Qwen2.5-Omni, значительная часть статьи уделена тому, как модель стримится. Авторы вновь используют асинхронный prefilling. Как только Thinker заканчивает prefilling для текущего чанка, его выходы отдаются в Talker, чтобы он тоже мог начать prefilling. При этом Thinker уже начинает обрабатывать следующий чанк.<br><br>Также исследователи заявляют, что используют только левый контекст для генерации аудио, в отличие от Qwen2.5-Omni, где создавалась задержка из-за того, что необходимо было накопить немного правого контекста. <br><br>Как и для Qwen2.5-Omni, предобучение проходит в три этапа:<br><br>- На первом замораживается LLM и обучаются только энкодеры и адаптеры для них (Encoder Alignment Stage). Причём начинают именно с адаптеров. В качестве инициализации для LLM используется Qwen3, для энкодера изображений — Qwen3-VL, для энкодера аудио — новый аудиоэнкодер, который обучили ранее.<br>- На второй стадии все параметры размораживаются, добавляются более разнообразные мультимодальные данные и задачи.<br>- На третьем этапе увеличивается контекстное окно с 8192 до 32768 токенов, чтобы модель могла обрабатывать длинные входы. Также в данные добавляются более длинные аудио/видео.<br><br>Дальше начинается post-training, который разделён для Thinker и Talker. <br><br>Для Thinker была только одна стадия — SFT (supervised fine-tuning), теперь добавлены ещё две: дистилляция, которая используется для получения более компактных LLM (по принципу Strong-to-Weak Distillation из Qwen3), и RL (GSPPO) — обучение с подкреплением, где оценивается качество отклика модели. Для задач с чёткими критериями (mathematics, coding) применяются награды, которые вычисляются по заранее заданным правилам. Для остальных задач, где сложно сформулировать чёткую награду, используется подход LLM-as-a-judge, где для оценки ответа модели используются Qwen3 и Qwen2.5-VL.<br><br>Для Talker раньше было три стадии, теперь — четыре. Первая — предварительное обучение на большом объёме данных с мультимодальным контекстом; вторая — добавление более качественных данных для борьбы с галлюцинациями после первой стадии; затем DPO (Direct Preference Optimization) и Speaker Fine-Tuning, чтобы Talker научился копировать тембр и интонации во время генерации аудио.<br><br>В качестве бонуса исследователи выпустили в опенсорс Qwen3-Omni-30B-A3B-Captioner — модель для решения задачи audio captioning на основе Qwen3-Omni-30B-A3B.<br><br>В результатах показано, что модель не теряет в качестве по сравнению с немультимодальными: сильна в ASR (китайский, английский), превосходит в музыкальных задачах, держит SOTA в тексте и визуале и поддерживает межъязыковой voice cloning.<br><br><em>Александр Паланевич</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a></div>
+      <div class="actions">
+        <span>1 012 просмотров · 25 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/94" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./94.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link" href="./95.html" style="visibility:visible">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./93.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 94, "media": []}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-03T14:58:39Z", "posts_count": 56, "last_seen_message_id": 117, "stats": {"new": 113, "updated": 0, "media_downloaded": 98}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>

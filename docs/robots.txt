@@ -1,0 +1,8 @@
+# Robots file is auto-generated; base URL is inferred from GitHub Pages when available.
+User-agent: *
+Allow: /
+Allow: /static/
+
+Sitemap: https://ml-brand.github.io/speechinfo/sitemap.xml
+Sitemap: https://ml-brand.github.io/speechinfo/feed.xml
+Sitemap: https://ml-brand.github.io/speechinfo/atom.xml

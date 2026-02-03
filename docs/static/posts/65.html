@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #65</title>
+  <meta name="description" content=" Обзор статей с ICASSP 25. Часть 4: другие интересные статьи   В заключительной части — три статьи: оценка качества аудио с помощью self-supervised-моделей, сравнение претрейнов для speaker recognitio" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/65.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #65" />
+  <meta property="og:description" content=" Обзор статей с ICASSP 25. Часть 4: другие интересные статьи   В заключительной части — три статьи: оценка качества аудио с помощью self-supervised-моделей, сравнение претрейнов для speaker recognitio" />
+  
+  <meta property="article:published_time" content="2025-08-08T14:19:52+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary" />
+  
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=65" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="65">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2025-08-08T14:19:52+00:00">2025-08-08 14:19 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Обзор статей с ICASSP 25. Часть 4: другие интересные статьи</strong><br><br>В заключительной части — три статьи: оценка качества аудио с помощью self-supervised-моделей, сравнение претрейнов для speaker recognition и новый подход к мультиспикерной ASR с учётом информации о говорящем. Предыдущие части: <a href="https://t.me/speechinfo/38" rel="nofollow noopener noreferrer">1</a>, <a href="https://t.me/speechinfo/39" rel="nofollow noopener noreferrer">2</a>, <a href="https://t.me/speechinfo/46" rel="nofollow noopener noreferrer">3</a>.<br><br><a href="https://arxiv.org/abs/2502.05356" rel="nofollow noopener noreferrer"><strong>Distillation and Pruning for Scalable Self-Supervised Representation-Based Speech Quality Assessment</strong></a><br><br>Авторы предлагают модель оценки качества речи на базе XLS-R. Сначала они обучают большую модель (XLS-R-SQA) на разных датасетах, включая Zoom-звонки, синтетические и музыкальные данные. Чтобы учесть различия между датасетами, в архитектуру добавляют обучаемые scale и shift для каждого из них. На инференсе используется общий вариант модели, который, судя по результатам, хорошо работает на разных типах данных. Но полученная модель слишком большая, чтобы использовать её для оценки качества шумоподавления.<br><br>Чтобы её уменьшить используют два способа: дистиллируют в меньшую (DistillMOS) и обрезку параметров (PruneMOS). Обе версии показывают стабильное качество на звонках, синтетических и музыкальных датасетах.<br><br>Авторы сравнивают полученные модели с DNSMOS — популярной системой оценки качества для шумоподавления, обученной на данных DNS Challenge. Показывают, что DNSMOS хорошо работает на звонках, но хуже обобщается на другие домены данных.<br><br>Основной вывод: DistillMOS и PruneMOS достигают сопоставимого качества при меньшем размере и лучше обобщаются за пределами звонковых сетов. Однако использовать предполагается именно DistillMOS, потому что прунинг работает лучше при достаточно в большом количестве параметров.<br><br><a href="https://www.researchgate.net/publication/390539139_In_Search_of_Optimal_Pretraining_Strategy_for_Robust_Speaker_Recognition" rel="nofollow noopener noreferrer"><strong>In Search of Optimal Pretraining Strategy for Robust Speaker Recognition</strong></a><br><br>Статья от российских авторов, которые изучают, как выбор претрейна влияет на устойчивость speaker verification моделей. Они используют TDNN-архитектуру поверх разных замороженных энкодеров: HuBERT, W2V, ASR-TDNN, и оценивают её на нескольких открытых датасетах.<br><br>На VOiCES и VoxCeleb1 системы на self-supervised фичах показывают сопоставимые или немного лучшие результаты по сравнению с бейзлайнами вроде ECAPA-TDNN и CAM++. Однако основное внимание в статье уделено обобщающей способности. На SRE&#x27;16, &#x27;19 и &#x27;21 (модели не обучались на этих датасетах) наименьший EER достигается при использовании ASR-претрейна и его фьюжена с другими энкодерами. Например, на SRE’19 CAM++ даёт 13.88, ASR-TDNN — 16.42, а их фьюжен — 9.66.<br><br>Авторы также анализируют влияние масштаба энкодера на переносимость. Эксперименты показывают, что более крупные энкодеры (например, обученные на LibriSpeech и VoxCeleb) помогают лучше обобщаться, даже если downstream TDNN остаётся компактным.<br><br><a href="https://arxiv.org/abs/2409.12352" rel="nofollow noopener noreferrer">META-CAT: Speaker-Informed Speech Embeddings via Meta Information Concatenation for Multi-talker ASR</a><br><br>Авторы исследуют задачу мультиспикерной ASR: модель должна распознавать речь сразу нескольких говорящих и приписывать реплики каждому из них. Решение основано на использовании speaker-aware эмбеддингов, собранных через элементное перемножение двух компонентов: ASR-эмбеддингов и вероятностей принадлежности каждого временного кадра конкретному спикеру.<br><br>Модель состоит из замороженного энкодера для диаризации и обучаемых компонентов — ASR-энкодера, speaker encoding слоя и RNNT-декодера. На вход модель получает аудио с несколькими спикерами и (опционально) короткий «query»-пример нужного говорящего. Выходом становится либо полная транскрипция с разметкой по спикерам (MS-ASR), либо только текст нужного говорящего (TS-ASR).<br><br>Ключевая часть архитектуры — блок speaker encoding. Он принимает ASR-эмбеддинги и вероятности по спикерам (из диаризации) и формирует многомерное представление, в котором каждый из каналов отвечает за конкретного спикера. Это представление затем поступает в декодер.<br><br>Авторы отдельно отмечают, что модель можно использовать и в сценарии, где нужно отслеживать только одного говорящего. В будущей работе авторы обещают поддержку стриминга.<br><br><em>Алексей Рак </em><em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a></div>
+      <div class="actions">
+        <span>911 просмотров · 13 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/65" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./65.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link" href="./66.html" style="visibility:visible">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./64.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 65, "media": []}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-03T14:58:39Z", "posts_count": 56, "last_seen_message_id": 117, "stats": {"new": 113, "updated": 0, "media_downloaded": 98}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #95</title>
+  <meta name="description" content=" Vevo2: Bridging Controllable Speech and Singing Voice Generation via Unified Prosody Learning   Разбираем  статью  о Vevo2 — унифицированной модели для генерации контролируемой речи и пения. Цель авт" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/95.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #95" />
+  <meta property="og:description" content=" Vevo2: Bridging Controllable Speech and Singing Voice Generation via Unified Prosody Learning   Разбираем  статью  о Vevo2 — унифицированной модели для генерации контролируемой речи и пения. Цель авт" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/95_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2025-11-12T11:07:32+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/95_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=95" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="95">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2025-11-12T11:07:32+00:00">2025-11-12 11:07 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Vevo2: Bridging Controllable Speech and Singing Voice Generation via Unified Prosody Learning</strong><br><br>Разбираем <a href="https://arxiv.org/pdf/2508.16332v1" rel="nofollow noopener noreferrer">статью</a> о Vevo2 — унифицированной модели для генерации контролируемой речи и пения. Цель авторов — создать гибкий механизм независимого управления текстом, просодией (мелодией), стилем (акцентом, эмоциями, вибрато) и тембром для обеих модальностей. В этом посте разберём вклад, который работа вносит в индустрию.<br><br><strong>Вклад в данные для пения<br></strong><br>Во-первых, авторы решают проблему дефицита аннотированных данных для пения. Предлагаются два аудиотокенизатора (не требующих ручной аннотации для музыкальных данных):<br><br>— Prosody Tokenizer (6.25 Гц) — VQ-VAE, обучаемый на реконструкции хромаграммы; кодирует просодию речи, мелодию пения и даже инструментальных звуков.<br>— Content-Style Tokenizer (12.5 Гц) — VQ-VAE, реконструирующий хромаграмму и скрытые состояния Whisper; кодирует лингвистический контент, просодию и стиль для речи и пения, устойчив к различному тембру, что авторы демонстрируют результатами в Voice Conversion.<br><br>Выбор хромаграммы с низкой частотой обусловлен простотой расчёта, устойчивостью к шуму и различным источникам, а также octave-free-представлением (снижает разрыв диапазона F0 между речью и пением).<br><br><strong>Архитектура Vevo2 включает два этапа:<br></strong><br>1. Авторегрессивное моделирование Content-Style-токенов (AR-трансформер, инициализированный Qwen 2.5 (0,5B):<br><br>— На вход принимает текст + (опционально) Prosody-токены + Content-Style токены референса.<br>— Поддерживает Explicit Prosody Learning (EPL) (просодия как явный ввод) и Implicit Prosody Learning (IPL) (просодия генерируется in-context).<br>— Во время претрейна стратегии EPL/IPL чередуются равновероятно для всех данных — это унифицирует обучение речи и пения.<br><br>2. Акустическое моделирование (Flow-Matching):<br>— Преобразует Content-Style-токены в мел-спектрограмму, обуславливаясь на референс тембра.<br>— Финальный waveform — через Vocos-вокодер, дообученный на речь и пение.<br><br><strong>Вклад в пострейн (GRPO)<br></strong><br>Этот этап нужен для повышения разборчивости речи и просодической схожести с контролирующей последовательностью, а также для обобщения на инструментальные источники мелодии.<br><br>Используется сумма двух наград:<br>— Intelligibility Reward: обучается на контрастив хороших-плохих пар (текст, Content-Style токены). Стратегии EPL/IPL как и на претрейне чередуются равновероятно.<br>— Prosody Similarity Reward: косинусная близость между хромаграммой ground-truth и реконструкцией (через декодер Content-Style Tokenizer) из сгенерированных Content-Style-токенов.<br><br>Унифицированное моделирование даёт взаимные преимущества: обилие речевых данных улучшает качество пения, пение — выразительность и просодический контроль речи. Vevo2 достигает SOTA в SVS, SVC, humming-to-singing, instrument-to-singing и близких к лучшим результатов в TTS/VC.<br><br><em>Дмитрий Попов</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/95_480.webp" srcset="../../assets/media/thumbs/95_480.webp 480w, ../../assets/media/95.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="95" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/96_480.webp" srcset="../../assets/media/thumbs/96_480.webp 480w, ../../assets/media/96.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="95" data-image-index="1" /></div></div>
+      <div class="actions">
+        <span>1 241 просмотров · 24 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/95" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./95.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link" href="./97.html" style="visibility:visible">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./94.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 95, "media": [{"kind": "photo", "path": "../../assets/media/95.jpg", "thumb": "../../assets/media/thumbs/95_480.webp", "size": 49640, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/96.jpg", "thumb": "../../assets/media/thumbs/96_480.webp", "size": 54981, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-03T14:58:39Z", "posts_count": 56, "last_seen_message_id": 117, "stats": {"new": 113, "updated": 0, "media_downloaded": 98}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
