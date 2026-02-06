@@ -2,13 +2,13 @@
   "title": "Speech Info",
   "username": "speechinfo",
   "channel": "speechinfo",
-  "last_sync_utc": "2026-02-06T07:36:05Z",
-  "posts_count": 56,
-  "last_seen_message_id": 117,
+  "last_sync_utc": "2026-02-06T08:24:23Z",
+  "posts_count": 57,
+  "last_seen_message_id": 121,
   "stats": {
-    "new": 57,
-    "updated": 11,
-    "media_downloaded": 57
+    "new": 61,
+    "updated": 12,
+    "media_downloaded": 61
   },
   "avatar": "assets/channel_avatar.jpg",
   "meta_schema_version": "1.0.0",
