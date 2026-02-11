@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="../../style.css" />
   <script src="../../metrika.js"></script>
 </head>
-<body data-index-href="../index.html">
+<body data-index-href="../page-2.html">
   <header class="header">
     <div class="container">
       <div class="title-grid single-title">
@@ -31,7 +31,7 @@
         </a>
         <div class="grid-main">
           <div class="title-head">
-            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="back-link" href="../page-2.html">← Ко всем постам</a>
             <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
             <div class="hero-actions">
               <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
@@ -60,8 +60,8 @@
       </div>
       <div class="post-body"><strong>Aligner-Encoders: Self-Attention Transformers Can Be Self-Transducers</strong><br><br>Можно ли выучить выравнивание между аудио и текстом без архитектур вроде RNN-T и без использования blank-токенов? Авторы этой <a href="https://arxiv.org/abs/2502.05232" rel="nofollow noopener noreferrer">статьи </a>считают, что можно. Достаточно self-attention-энкодера с отдельной головой, которая решает, на каких шагах нужно выпускать токены.<br><br>Классические ASR-модели (RNN-T, AED) формируют выравнивание во время декодирования: логиты зависят от возможных переходов по временной оси. Это требует либо динамического программирования (в CTC), либо перебора всех допустимых путей (в RNN-T). В Aligner-Encoder модель учится решать, стоит ли выпускать токен на каждом аудиофрейме. В энкодер добавляют FF-слой (aligner head), обучаемый по меткам из CTC loss. Принудительное выравнивание не требуется.<br><br>Токены добавляются только тогда, когда aligner говорит «да» — без использования blank-символов или графа выравнивания. Модель не создаёт лишних гипотез, декодинг упрощается, сложность по памяти — существенно ниже: O(U×Vocab) против O(U×T×Vocab) у RNN-T.<br><br>Что касается архитектуры, энкодер состоит из 2D-свёрток и Conformer-блоков (FFN, multi-head attention, 1D conv, residuals). Вход — log-mel-спектрограммы (окно 32 мс, шаг 10 мс), токены — WordPiece, используется label smoothing (δ = 2/V), чтобы избежать смещения к коротким предсказаниям.<br><br>Начиная с 14-го слоя self-attention, первые текстовые токены начинают фокусироваться на соответствующих аудиофреймах — это можно проследить по диагональному паттерну. Модель при этом «сдвигает» важные представления ближе к началу, сохраняя порядок токенов. В обычных энкодерах такого сдвига не происходит.<br><br>Модель обучалась на трёх англоязычных датасетах:<br>— LibriSpeech (960 часов),<br>— Voice Search,<br>— YouTube (670 тысяч часов псевдозаписей длиной 5–15 секунд).<br><br>Для оценки на YouTube выделили 30 часов 8-минутных аудиофрагментов (по 15 часов на валидацию и тест). Модель показывает точность на уровне CTC-базлайна на LibriSpeech и превосходит его на YouTube.<br><br>Авторы также проверяют, можно ли использовать обученный aligner в других моделях. В одном из экспериментов инициализируют RNN-T слоями из выученного энкодера  и получают улучшение по метрикам. Это показывает, что aligner-head может использоваться как самостоятельный механизм выравнивания.<br><br>Несмотря на то, что в названии статьи сделан акцент на выравнивание, главная польза модели — в скорости и простоте. В сравнительном эксперименте все модели были одного размера (100 млн параметров). На обучении Aligner оказался в 10 раз быстрее RNN-T (29 мс против 290 мс на шаг), главным образом за счёт отказа от сканирования по временной оси в join-сети. Это также позволило снизить пиковое потребление памяти на 18 % (−1.4 ГБ). На инференсе модель тоже самая быстрая: каждый шаг декодера занимает 0,19 мс против 8,5 мс у AED. Общая сложность — O(U), тогда как у RNN-T — O(U+T), где U — длина текста, T — длина аудио. Переупорядочивание гипотез в beam почти не требуется. Отдельно подчёркивается, что хоть AED и делает шаги почти так же быстро, как Aligner, благодаря трансформерной природе он сходится за меньшее число итераций.<br><br><em>Илья Новицкий </em><em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/63_480.webp" srcset="../../assets/media/thumbs/63_480.webp 480w, ../../assets/media/63.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="63" data-image-index="0" /></div></div>
       <div class="actions">
-        <span>1 073 просмотров · 20 реакций</span>
-        <span class="action-links"><a href="https://t.me/speechinfo/63" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./63.html">Ссылка на этот пост</a></span>
+        <span>1 074 просмотров · 20 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/63" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../page-2.html">К списку постов</a> · <a href="./63.html">Ссылка на этот пост</a></span>
       </div>
     </article>
 
@@ -87,7 +87,7 @@
 
   <script>
     window.__STATIC_POSTS = [{"id": 63, "media": [{"kind": "photo", "path": "../../assets/media/63.jpg", "thumb": "../../assets/media/thumbs/63_480.webp", "size": 71086, "mime": "image/jpeg", "name": null}]}];
-    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-11T08:28:42Z", "posts_count": 57, "last_seen_message_id": 121, "stats": {"new": 60, "updated": 2, "media_downloaded": 60}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-11T09:37:14Z", "posts_count": 58, "last_seen_message_id": 123, "stats": {"new": 62, "updated": 32, "media_downloaded": 62}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
   </script>
   <script src="../../common.js"></script>
   <script src="../../static.js"></script>
