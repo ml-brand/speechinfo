@@ -59,7 +59,7 @@
       </div>
       <div class="post-body"><strong>DMDSpeech: Distilled Diffusion Model Surpassing The Teacher in Zero-shot Speech Synthesis via Direct Metric Optimization</strong><br><br>Сегодня разберём <a href="https://arxiv.org/abs/2410.11097v1" rel="nofollow noopener noreferrer">статью</a> о синтезе речи с помощью диффузионных моделей. Авторы из Adobe Research утверждают, что им удалось избавиться от главного недостатка такого подхода — медленного итеративного инференса — при помощи оригинального метода дистилляции.<br><br>Называется новый метод Direct Metric Optimization. Именно он вкупе с уже известной (но не очень популярной) методикой дистилляции DMD и бейзлайн-архитектурой Latent Speech Diffusion позволяет улучшить качество генераций.<br><br>Latent Speech Diffusion — диффузионный трансформер, оперирующий в пространстве непрерывных латентов (continious latents). Латенты авторы получают из чистой wave-формы при помощи энкодера дискретного аудиокодека. Потом добавляют к ним шум, U-net-подобной архитектурой итеративно расшумляют и декодируют с помощью стандартного диффузионного лосса.<br><br>Поскольку модель не авторегрессионная, размерность выхода необходимо знать заранее. Её выясняют, перемножая количество фонем на speaking rate речевого промпта. <br><br>Метод DMD работает так: расшумлённый результат ученика в заданный момент времени приближают к аналогичному результату учителя от одного зашумлённого латента. Для этого обучают специальную состязательную модель: <br><br>- при помощи дискриминатора отличать результаты ученика и учителя;<br>- сокращать за счёт ученика разницу между ним и учителем.<br><br>Предложенный метод генерации речи — end-to-end. Это значит, что в обучение для Direct Metric Optimization можно добавлять SV- и ASR-лоссы.<br><br>Аудиосэмплы доступны <a href="https://dmdspeech.github.io/" rel="nofollow noopener noreferrer">на GitHub</a>.<br><br><em>Дмитрий Попов</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a></div>
       <div class="actions">
-        <span>972 просмотров · 24 реакций</span>
+        <span>973 просмотров · 24 реакций</span>
         <span class="action-links"><a href="https://t.me/speechinfo/45" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../page-2.html">К списку постов</a> · <a href="./45.html">Ссылка на этот пост</a></span>
       </div>
     </article>
@@ -86,7 +86,7 @@
 
   <script>
     window.__STATIC_POSTS = [{"id": 45, "media": []}];
-    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-15T21:00:02Z", "posts_count": 58, "last_seen_message_id": 123, "stats": {"new": 61, "updated": 4, "media_downloaded": 61}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-15T21:57:28Z", "posts_count": 58, "last_seen_message_id": 123, "stats": {"new": 61, "updated": 17, "media_downloaded": 61}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
   </script>
   <script src="../../common.js"></script>
   <script src="../../static.js"></script>
