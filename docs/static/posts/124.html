@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #124</title>
+  <meta name="description" content=" Simul-Whisper: Attention-Guided Streaming Whisper with Truncation Detection    Сегодня разбираем короткую и довольно простую  статью  о стриминговом Whisper’e. Whisper — это encoder-decoder-модель, и" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/124.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #124" />
+  <meta property="og:description" content=" Simul-Whisper: Attention-Guided Streaming Whisper with Truncation Detection    Сегодня разбираем короткую и довольно простую  статью  о стриминговом Whisper’e. Whisper — это encoder-decoder-модель, и" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/124_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-02-19T09:36:22+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/124_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=124" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="124">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-02-19T09:36:22+00:00">2026-02-19 09:36 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Simul-Whisper: Attention-Guided Streaming Whisper with Truncation Detection <br></strong><br>Сегодня разбираем короткую и довольно простую <a href="https://arxiv.org/abs/2406.10052" rel="nofollow noopener noreferrer">статью</a> о стриминговом Whisper’e. Whisper — это encoder-decoder-модель, и если в стриминге каждый раз прогонять декодер заново на всём аудио, получается слишком дорого. Поэтому авторы предлагают на каждом новом чанке заново прогонять только энкодер, а дальше следить, чтобы декодер не упирался в конец чанка и не начинал угадывать слова неправильно.<br><br><strong>Низкий WER degradation<br></strong><br>Под WER degradation понимают то, как сильно ухудшается word error rate при переходе от офлайна к стримингу. В таблице выше авторы сравнили разные стратегии: офлайн-бейзлайн, Local Agreement и предложенный метод. <br><br>В правом столбце Δ показана средняя деградация — и у нового подхода она самая маленькая: всего 1,46%, то есть качество почти не проседает по сравнению с распознаванием в офлайне.<br><br><strong>Почему стриминг ломается на границах чанков</strong><br><strong><br></strong>Проблема кроется в архитектуре Whisper. Это Seq2Seq-модель, обученная на <strong>полных предложениях</strong>. Она всегда стремится выдать законченный, осмысленный текст и не умеет «молчать» или выдавать части слов.<br><br>Рассмотрим пример с фразой <em>“Shall we be companions?”</em>, где граница чанка разрезала слово <em>“companions”</em>. Происходит следующее.<br><br><strong>1. Акустическая ловушка.</strong> Модель получает аудио, которое обрывается на звуке <em>&quot;be com...&quot;</em>.<br><br><strong>2. Принудительный выбор (Forced Prediction).</strong> Модель слышит &quot;<em>be com...&quot;</em>. В её словаре токенов (BPE) наиболее вероятным кандидатом для этого звукового паттерна оказывается токен <em>&quot;become&quot;</em>. Поскольку модель обучена на завершённых фразах, она стремится «закрыть» акустический паттерн известным ей токеном, вместо того чтобы ждать продолжения (которого в текущем чанке нет).<br><br><strong>3. Ошибка токенизации. </strong>Как только токен <em>&quot;become&quot;</em> сгенерирован, он становится частью истории. Когда приходит следующий кусок звука &quot;<em>...panions&quot;</em>, декодер уже не может отменить предыдущий токен. Пытаясь продолжить текст после <em>&quot;become&quot;</em>, декодер подбирает следующий наиболее вероятный токен — <em>&quot;ponies&quot;</em>, так как он фонетически похож на входящий звук и хоть как-то согласуется с предыдущим контекстом.<br><br><strong>Итог: </strong>ошибка возникает из-за того, что модель пытается «додумать» обрезанный край чанка, принимая преждевременное решение, которое потом невозможно исправить.<br><br><strong>Решение — метод из двух частей<br></strong><br>В статье предлагают подход, в котором одна составляющая определяет, где можно безопасно резать, а другая — когда пора запросить следующий чанк.<br><br><strong>1. Truncation Detection Module (TDM)</strong>, построенный на механизме Integrate-and-Fire (IF). Модель постепенно накапливает некоторую величину по аудиофреймам. Когда накопление превышает порог, происходит “fire” — это считается сигналом, что слово закончилось и здесь можно обрезать. Обучение происходит таким образом, чтобы количество срабатываний совпадало с количеством слов.<br><br><strong>2. Attention-Guided Decoding Policy</strong> — эта часть выглядит даже более важной. Поскольку Whisper обучался на задаче предсказания таймстемпов (alignment), его карты внимания (attention maps) очень чётко «подсвечивают» тот участок аудио, который соответствует текущему слову.  Авторы смотрят, куда «смотрит» модель. Если пик внимания (максимальный вес) приходится на самый конец текущего аудиочанка (последние фреймы), это красный флаг.<br><br>- Это значит: «Я пытаюсь декодировать слово, но его аудиопризнаки обрываются на самом интересном месте».<br>- В этот момент нужно остановить генерацию и ждать следующий чанк.<br><br><strong>Результаты<br></strong><br>В конце авторы приходят к выводу, что можно сделать стриминговый Whisper, который почти не теряет в качестве, избегает ошибок на границах чанков, работает с меньшей задержкой, чем Local Agreement. Таблица в конце подтверждает, что на больших моделях (Large-v2) метод даёт хороший баланс между скоростью и точностью.<br><br><em>Вилиана Девбунова</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/124_480.webp" srcset="../../assets/media/thumbs/124_480.webp 480w, ../../assets/media/124.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="124" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/125_480.webp" srcset="../../assets/media/thumbs/125_480.webp 480w, ../../assets/media/125.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="124" data-image-index="1" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/126_480.webp" srcset="../../assets/media/thumbs/126_480.webp 480w, ../../assets/media/126.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="124" data-image-index="2" /></div></div>
+      <div class="actions">
+        <span>165 просмотров · 11 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/124" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./124.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./122.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 124, "media": [{"kind": "photo", "path": "../../assets/media/124.jpg", "thumb": "../../assets/media/thumbs/124_480.webp", "size": 127831, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/125.jpg", "thumb": "../../assets/media/thumbs/125_480.webp", "size": 49221, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/126.jpg", "thumb": "../../assets/media/thumbs/126_480.webp", "size": 51806, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-19T10:27:48Z", "posts_count": 59, "last_seen_message_id": 126, "stats": {"new": 64, "updated": 26, "media_downloaded": 64}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
