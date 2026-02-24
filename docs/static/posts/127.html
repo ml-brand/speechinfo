@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #127</title>
+  <meta name="description" content=" DiTAR: Diffusion Transformer Autoregressive Modeling for Speech Generation   Сегодня обсудим  статью  о DiTAR — фреймворке авторегрессии, который объединяет языковую модель и диффузионный трансформер" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/127.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #127" />
+  <meta property="og:description" content=" DiTAR: Diffusion Transformer Autoregressive Modeling for Speech Generation   Сегодня обсудим  статью  о DiTAR — фреймворке авторегрессии, который объединяет языковую модель и диффузионный трансформер" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/127_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-02-24T10:51:34+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/127_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=127" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="127">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-02-24T10:51:34+00:00">2026-02-24 10:51 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>DiTAR: Diffusion Transformer Autoregressive Modeling for Speech Generation</strong><br><br>Сегодня обсудим <a href="https://arxiv.org/abs/2502.03930" rel="nofollow noopener noreferrer">статью</a> о DiTAR — фреймворке авторегрессии, который объединяет языковую модель и диффузионный трансформер для синтеза речи. <br><br>Модели Text-to-Speech часто учат на дискретных токенах, но в сочетании с нюансами архитектуры, погрешностью трансформера и декодера это приводит к накоплению ошибок — а значит, затрудняет качественную генерацию непрерывных объектов. <br><br>Авторы искали новый способ предсказания непрерывных представлений аудио — и утверждают, что DiTAR значительно повышает эффективность авторегрессии для непрерывных токенов и снижает требования к вычислениям. <br><br>Совместив сильные стороны диффузионных трансформеров и больших языковых моделей, авторы: <br><br>— разбивают непрерывные представления на патчи, <br>— обучают каузальный авторегрессионный трансформер делать inter-patch-предсказания, <br>— bidirectional-диффузионный трансформер, опираясь на эти внутренние представления, делает intra-patch-предсказания. <br><br>Рассмотреть архитектуру решения можно на схеме. Каузальному авторегрессионному трансформеру подают на вход набор непрерывных векторов (continuous speech tokens). А потом группируют их в патчи и ужимают в один вектор энкодером, чтобы снизить размерность и ускорить трансформер. <br><br>Диффузионный трансформер предсказывает следующий патч по выходам каузального авторегрессионного трансформера. Авторы утверждают, что если хранить историю патчей и подмешивать предыдущие на каждой новой итерации, задача станет ближе к outpainting, что помогает вырастить качество финальной генерации.<br><br>Для того чтобы сохранить возможность разнообразного семплирования, авторы добавили температуру в ODE-солвер. В DiTAR температура — момент времени в процессе генерации, когда вводится шум. Она позволяет гибко управлять вариативностью речи (от стабильной дикции до богатых интонаций) без замедления работы модели.<br><br>При генерации речи zero-shot DiTAR показывал SoTA-результаты в схожести говорящих и естественности. В следующей своей статье, <a href="https://arxiv.org/abs/2510.12210" rel="nofollow noopener noreferrer">DiSTAR</a>, они опираются на наработки из этой. Но вместо непрерывных фич моделируют RVQ-токены — модель, несмотря на небольшой размер, показывает хорошие метрики.<br><br><em>Александр Плахин</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/127_480.webp" srcset="../../assets/media/thumbs/127_480.webp 480w, ../../assets/media/127.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="127" data-image-index="0" /></div></div>
+      <div class="actions">
+        <span>140 просмотров · 18 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/127" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./127.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./124.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 127, "media": [{"kind": "photo", "path": "../../assets/media/127.jpg", "thumb": "../../assets/media/thumbs/127_480.webp", "size": 50061, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-02-24T11:27:47Z", "posts_count": 60, "last_seen_message_id": 127, "stats": {"new": 64, "updated": 17, "media_downloaded": 64}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
