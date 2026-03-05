@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #128</title>
+  <meta name="description" content=" M³V: A Multi-Modal Multi-View Approach for Device-Directed Speech Detection   В последнее время всё больше исследований посвящено голосовой активации умного ассистента без называния имени (например, " />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/128.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #128" />
+  <meta property="og:description" content=" M³V: A Multi-Modal Multi-View Approach for Device-Directed Speech Detection   В последнее время всё больше исследований посвящено голосовой активации умного ассистента без называния имени (например, " />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/128_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-03-05T09:06:40+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/128_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=128" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="128">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-03-05T09:06:40+00:00">2026-03-05 09:06 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>M³V: A Multi-Modal Multi-View Approach for Device-Directed Speech Detection</strong><br><br>В последнее время всё больше исследований посвящено голосовой активации умного ассистента без называния имени (например, «Алиса»). Это позволяет вести более естественный диалог и повышает комфорт пользователя.<br><br>Чтобы решить данную задачу, нужна ML-модель для определения, направлена речь в устройство или нет. В Яндексе такую модель называют «<a href="https://t.me/MLunderhood/77" rel="nofollow noopener noreferrer">интонационным споттером</a>».<br><br>Сегодня разберём <a href="https://arxiv.org/abs/2409.09284" rel="nofollow noopener noreferrer">статью</a>, в которой рассматривается случай умного помощника для автомобиля. Авторы развивают существующую схему двух энкодеров: для звука и для распознанного текста.<br><br>При распознавании речи в реальных условиях неизбежны ошибки. Необходимо сбалансировать обучение таким образом, чтобы модель видела и верно, и неверно распознанные пары «текст — речь».<br><br>Авторы предлагают использовать дополнительные модальности, а полученный фреймворк называют M³V.<br><br>Решается задача бинарной классификации «в девайс или не в девайс». В качестве энкодеров берут GPT-2 для текстовой модальности и Wav2Vec2 для звука. Результаты работы энкодера пулятся вдоль временного измерения для получения представления для всего звука <em>(формула 1)</em>.<br><br>Результаты работы этих двух энкодеров используются в качестве входов для четырёх разных голов сети: <br><br>- чисто звуковой;<br>- чисто текстовой;<br>- мультимодальной (конкатенированной);<br>- выравнивания (обучаемая функция для сближения двух эмбеддингов для получения выравниваний).<br><br>Для получения сближённых эмбеддингов обучаются два проецирующих модуля: отдельно для эмбеддингов текста и отдельно — для речи <em>(формула 3)</em>.<br><br>Проекции обучаются с помощью contrastive loss. То есть для текста и звука i-го элемента батча они учатся быть близкими (по косинусному расстоянию), а для других элементов батча — отстоять далеко. <br><br>Получается алайнмент. Contrastive score используется как компонент лосса, а косинусное произведение — как alignment score. <br><br>Итоговый лосс состоит из трёх бинарных кросс-энтропий и contrastive loss.<br><br>Коэффициенты при лоссах адаптивные. Веса энкодеров не замораживаются. Решение принимается либо по порогам трёх вероятностей и alignment score, либо с помощью SVM.<br><br>Обучение проводилось на 340 часах данных (500 тысяч записей) из машины. Тестовый набор — такой же + 560 сложных примеров с плохим распознаванием.<br><br>Эксперименты показывают, что предложенный метод позволяет добиться улучшения относительно отдельных компонент по EER даже при использовании датасета с ошибочным ASR. <br><br><em>Павел Мазаев</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/128_480.webp" srcset="../../assets/media/thumbs/128_480.webp 480w, ../../assets/media/128.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="128" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/129_480.webp" srcset="../../assets/media/thumbs/129_480.webp 480w, ../../assets/media/129.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="128" data-image-index="1" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/130_480.webp" srcset="../../assets/media/thumbs/130_480.webp 480w, ../../assets/media/130.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="128" data-image-index="2" /></div></div>
+      <div class="actions">
+        <span>105 просмотров · 13 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/128" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./128.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./127.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 128, "media": [{"kind": "photo", "path": "../../assets/media/128.jpg", "thumb": "../../assets/media/thumbs/128_480.webp", "size": 71390, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/129.jpg", "thumb": "../../assets/media/thumbs/129_480.webp", "size": 15860, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/130.jpg", "thumb": "../../assets/media/thumbs/130_480.webp", "size": 13711, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-03-05T09:27:34Z", "posts_count": 61, "last_seen_message_id": 130, "stats": {"new": 66, "updated": 31, "media_downloaded": 66}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
