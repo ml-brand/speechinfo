@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #131</title>
+  <meta name="description" content=" Pseudo2Real: Task Arithmetic for Pseudo-Label Correction in Automatic Speech Recognition   Сегодня разбираем  статью  о том, как бороться с систематическими ошибками псевдолейблинга в ASR.  Аудиоданн" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/131.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #131" />
+  <meta property="og:description" content=" Pseudo2Real: Task Arithmetic for Pseudo-Label Correction in Automatic Speech Recognition   Сегодня разбираем  статью  о том, как бороться с систематическими ошибками псевдолейблинга в ASR.  Аудиоданн" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/131_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-03-11T11:14:01+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/131_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=131" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="131">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-03-11T11:14:01+00:00">2026-03-11 11:14 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Pseudo2Real: Task Arithmetic for Pseudo-Label Correction in Automatic Speech Recognition<br></strong><br>Сегодня разбираем <a href="https://arxiv.org/abs/2510.08047v1" rel="nofollow noopener noreferrer">статью</a> о том, как бороться с систематическими ошибками псевдолейблинга в ASR.<br><br>Аудиоданных разных доменов существует огромное количество, но для конкретных задач (например, редких акцентов) разметки часто нет. Сбор качественных транскрипций стоит дорого и занимает много времени. В таких случаях выходом становится псевдолейблинг: сначала модель обучают на размеченных данных, потом она сама делает псевдолейблы для неразмеченных, а дальше модель дообучают уже на них.<br><br>Проблема в том, что псевдолейблинг даёт разметку, далекую от совершенства, — с ошибками и байесами. И если модель учится на этом итеративно, ошибки не исчезают, а накапливаются. В итоге появляются устойчивые паттерны, которые не лечатся простым уменьшением шума или confidence-фильтрацией.<br><br>Главный вопрос статьи такой: как уменьшить систематические ошибки псевдолейблинга, если в target-домене вообще нет ground truth?<br><br>Идея авторов — использовать task arithmetic. В упрощённом виде это выглядит так:<br><br>1. Берём предобученную ASR-модель и файнтюним её на source-домене с настоящей разметкой.<br>2. Отдельно обучаем модель на псевдолейблах source-домена.<br>3. Вычитаем параметры одной модели из другой и получаем correction vector — вектор, который описывает, что именно «портит» обучение на псевдолейблах.<br><br>Дальше этот correction vector добавляют при адаптации модели на target-домене, где есть только псевдолейблы. Смысл в том, чтобы при дообучении на псевдолейблах модель меньше перенимала их систематические ошибки.<br><br>В статье это показывают на примере смены акцентов: target-домен — это акценты, которых не было в source-домене. В экспериментах используют <a href="https://huggingface.co/datasets/intronhealth/afrispeech-200" rel="nofollow noopener noreferrer">AfriSpeech-200</a> — датасет, в котором люди из африканских стран на английском языке с заметными акцентами наговаривают тексты на медицинскую и общую тематику.<br><br>Также в работе рассматривают вариант метода с subgroup correction. Вместо одного общего correction vector строят отдельные векторы для разных групп спикеров, а затем усредняют их и используют при адаптации модели к target-домену.<br><br>Эксперименты проводят через кросс-валидацию по акцентам: часть акцентов используют как source-домен, остальные — как target-домен, и так по всем разбиениям.<br><br>В таблице с результатами сравнивают несколько сценариев. Выводы следующие:<br><br>- Предобученная модель (zero-shot) на новых акцентах даёт высокий WER.<br><br>- Стандартный псевдолейблинг (файнтюн на сгенерированной разметке) значительно улучшает качество, но наследует систематические ошибки учителя.<br><br>- Confidence-based filtering (отсев неуверенных предсказаний) даёт лишь небольшой прирост и не решает проблему закрепившихся паттернов ошибок.<br><br>- <strong>Pseudo2Real</strong> показывает существенное снижение WER против обычного псевдолейблинга (до 35% относительного улучшения на Whisper Tiny).<br><br>- <strong>Pseudo2Real-SC</strong> (Subgroup Correction) с кластеризацией спикеров даёт дополнительный прирост качества (в среднем ещё на 4–6%), особенно эффективно исправляя ошибки на самых сложных акцентах (например язык хауса), так как учитывает разнообразие дикторов.<br><br>- Topline (обучение на реальной разметке target-домена) — теоретический «потолок» качества. Однако авторы отмечают важный инсайт: на некоторых сложных акцентах и малых моделях Pseudo2Real оказывается даже эффективнее топлайна. Вектор коррекции действует как регуляризация, не давая модели переобучиться, что часто случается при прямом файнтюне на малом объёме реальных данных.<br><br><em>Егор Реутов</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/131_480.webp" srcset="../../assets/media/thumbs/131_480.webp 480w, ../../assets/media/131.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="131" data-image-index="0" /></div></div>
+      <div class="actions">
+        <span>63 просмотров · 7 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/131" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./131.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./128.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 131, "media": [{"kind": "photo", "path": "../../assets/media/131.jpg", "thumb": "../../assets/media/thumbs/131_480.webp", "size": 107061, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-03-11T11:21:08Z", "posts_count": 62, "last_seen_message_id": 131, "stats": {"new": 66, "updated": 16, "media_downloaded": 66}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
