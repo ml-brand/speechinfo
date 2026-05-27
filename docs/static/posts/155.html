@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #155</title>
+  <meta name="description" content=" Qwen3-TTS Technical Report [1/2]   Команда Alibaba представила  Qwen3-TTS  — семейство моделей для синтеза речи, которым под силу voice cloning и voice design по текстовому описанию, а также fine-gra" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/155.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #155" />
+  <meta property="og:description" content=" Qwen3-TTS Technical Report [1/2]   Команда Alibaba представила  Qwen3-TTS  — семейство моделей для синтеза речи, которым под силу voice cloning и voice design по текстовому описанию, а также fine-gra" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/155_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-05-27T09:07:01+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/155_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=155" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="155">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-05-27T09:07:01+00:00">2026-05-27 09:07 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Qwen3-TTS Technical Report [1/2]<br></strong><br>Команда Alibaba представила <a href="https://arxiv.org/abs/2601.15621" rel="nofollow noopener noreferrer">Qwen3-TTS</a> — семейство моделей для синтеза речи, которым под силу voice cloning и voice design по текстовому описанию, а также fine-grained control голоса. Сегодня разберём, как они устроены с точки зрения архитектуры, а в следующем посте подробнее остановимся на их обучении. <br><br>Все модели работают на дискретных токенах с авторегрессионной LLM. Но в Qwen3-TTS авторы делают не один токенайзер, а сразу два.<br><br>На схеме слева — <strong>Qwen-TTS-Tokenizer-25Hz</strong>. Подход похож на <a href="https://arxiv.org/abs/2407.05407" rel="nofollow noopener noreferrer">CosyVoice</a>: это 25 Гц single-codebook-токенайзер, построенный поверх <a href="https://arxiv.org/abs/2407.10759" rel="nofollow noopener noreferrer">Qwen-2-Audio</a>. Его обучают в два этапа. Сначала продолжают претрейн Qwen2-Audio на ASR-задаче и вставляют VQ-слой, чтобы получить семантические токены. Затем добавляют свёрточный декодер и дообучают модель на восстановление мел-спектрограмм, чтобы подмешать акустическую информацию. Видимо, чисто семантических токенов не всегда хватает для выразительного TTS. На полученных токенах обучают стриминговый блочный DiT с flow-matching, чтобы предсказывать мел-спектрограмму. Для восстановления аудио используют модифицированный BigVGAN.<br><br>На схеме справа — <strong>Qwen-TTS-Tokenizer-12Hz</strong>. Это уже 12,5 Гц токенайзер со Split-VQ и суммарно 16 уровнями квантизации. Первый его кодбук отвечает за семантику, остальные 15 — добавляют акустические детали через RVQ. Есть дистилляция в семантический кодбук эмбеддингов WavLM. Подход сильно вдохновлён <a href="https://huggingface.co/kyutai/mimi" rel="nofollow noopener noreferrer">Mimi</a>, но Qwen переделали декодер, где использовали ConvNeXt-блоки и Snake-активации.<br><br>Архитектурно Qwen3-TTS базируется на семействе Qwen3 LM. Входная последовательность конкатенирует текстовые и речевые токены по channel axis. Для контроля спикера используется обучаемый speaker-encoder. <br><br>Для кодека с 12 Гц основной backbone transformer предсказывает нулевой семантический codebook, а затем MTP-модуль достраивает оставшиеся уровни с акустическими деталями. Для 25 Гц версии используется стандартный AR-трансформер, предсказанные токены которого декодирует DiT.<br><br><em>Владимир Гогорян</em> <tg-emoji emoji-id="5224192932302565805">❣</tg-emoji> <em>Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/155_480.webp" srcset="../../assets/media/thumbs/155_480.webp 480w, ../../assets/media/155.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="155" data-image-index="0" /></div></div>
+      <div class="actions">
+        <span>255 просмотров · 14 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/155" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./155.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./153.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 155, "media": [{"kind": "photo", "path": "../../assets/media/155.jpg", "thumb": "../../assets/media/thumbs/155_480.webp", "size": 73082, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-05-27T11:23:56Z", "posts_count": 76, "last_seen_message_id": 155, "stats": {"new": 76, "updated": 33, "media_downloaded": 76}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
