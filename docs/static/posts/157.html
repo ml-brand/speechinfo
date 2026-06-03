@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #157</title>
+  <meta name="description" content=" Три работы о том, как сделать речь полноценной модальностью для LLM   В сегодняшней подборке — три любопытные идеи: от генерации голосового ответа с ризонингом без лишней задержки до более компактных" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/157.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #157" />
+  <meta property="og:description" content=" Три работы о том, как сделать речь полноценной модальностью для LLM   В сегодняшней подборке — три любопытные идеи: от генерации голосового ответа с ризонингом без лишней задержки до более компактных" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/157_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-06-03T09:15:21+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/157_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=157" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="157">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-06-03T09:15:21+00:00">2026-06-03 09:15 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Три работы о том, как сделать речь полноценной модальностью для LLM<br></strong><br>В сегодняшней подборке — три любопытные идеи: от генерации голосового ответа с ризонингом без лишней задержки до более компактных речевых представлений и подготовки аудиоданных для мультимодального претрейна.<br><br><a href="https://arxiv.org/abs/2507.15375v1" rel="nofollow noopener noreferrer"><strong>STITCH: Simultaneous Thinking and Talking with Chunked Reasoning for Spoken Language Models<br></strong></a><br>Статья Microsoft о том, как добавить ризонинг в speech или audio LLM, не увеличивая задержку ответа. Предлагают генерировать ризонинг-токены параллельно с аудиоответом. Модель чередует генерацию аудиотокенов и текстовых thinking-токенов: сначала выдаёт звуковой фрагмент, потом — кусок ризонинга, снова продолжает аудиоответ и так далее. В результате ризонинг интерливится с генерацией речи.<br><br>Идея строится на том, что модель генерирует аудиотокены быстрее, чем пользователь успевает их прослушать. Например, за 0,5 секунды она может нагенерить аудио, которое будет звучать примерно 2 секунды. Остаётся свободное время, в которое модель может генерировать ризонинг-токены, почти не увеличивая задержку ответа.<br><br>Авторы сравнивают несколько режимов: бейзлайн без ризонинга, который даёт минимальную задержку; режим с ризонингом перед аудиоответом, где качество выше, но latency сильно растет; и STITCH — предложенный подход, в котором ризонинг встраивается прямо в генерацию речи. STITCH сохраняет задержку почти на уровне бейзлайна, при этом даёт качество, близкое к режиму с предварительным ризонингом.<br><br><a href="https://arxiv.org/abs/2510.06195v1" rel="nofollow noopener noreferrer"><strong>Latent Speech-Text Transformer<br></strong></a><br>Аудио обычно менее компактно, чем текст. Условно, модель видит три текстовых токена в секунду, но при этом — десятки аудиотокенов. Из-за этого сложно нормально связать их семантические составляющие.<br><br>Авторы пытаются сделать аудио компактнее и понятнее для LLM. Для этого используют идею патчинга из CV: несколько аудиотокенов объединяют в один latent patch. Но делают это не фиксированным сжатием по типу «каждые четыре токена в один», а так, чтобы патч покрывал осмысленный фрагмент речи — например, слово целиком, — чтобы внутри сохранялась цельная семантика.<br><br>Для этого обучают отдельный patch encoder в несколько этапов — авторы называют это curriculum patching. Сначала границы патчей задаются довольно жёстко через force alignment: модель получает подсказку, какие аудиотокены соответствуют словам. Затем эти границы постепенно делают менее строгими, чтобы encoder учился не просто повторять разметку, а находить более гибкие группировки. На финальной стадии модель уже самостоятельно решает, как объединять аудиотокены в латентные патчи.<br><br><a href="https://arxiv.org/abs/2510.20860v1" rel="nofollow noopener noreferrer"><strong>Data-Centric Lessons To Improve Speech-Language Pretraining<br></strong></a><br>Работа от Apple о том, как добавлять аудиоданные в текстовые LLM. Предлагают interleaved-обучать модель на цепочках, где последовательности текста и аудио чередуются.<br><br>Данные чистят, делают диаризацию, режут длинные записи на небольшие чанки и стараются оставлять фрагменты с одним спикером. Экспериментируют с размером чанков и делают вывод, что маленькие работают лучше. Скорее всего, когда текст и аудио тесно переплетены, модель лучше связывает модальности между собой.<br><br>Также данные пытаются балансировать по доменам: используют отдельную модель, которая классифицирует тематики и подмешивают аудиоданные так, чтобы распределение было похоже на текстовый претрейн.<br><br>Авторы показывают улучшения даже на текстовых метриках после аудиопретрейна. Правда, модель довольно маленькая (3.8B), внутренняя и, возможно, просто недоучена. <br><br><em>Ярослав Ведерников</em> <tg-emoji emoji-id="5224192932302565805">❣</tg-emoji> <em>Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/157_480.webp" srcset="../../assets/media/thumbs/157_480.webp 480w, ../../assets/media/157.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="157" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/158_480.webp" srcset="../../assets/media/thumbs/158_480.webp 480w, ../../assets/media/158.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="157" data-image-index="1" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/159_480.webp" srcset="../../assets/media/thumbs/159_480.webp 480w, ../../assets/media/159.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="157" data-image-index="2" /></div></div>
+      <div class="actions">
+        <span>243 просмотров · 18 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/157" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./157.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./156.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 157, "media": [{"kind": "photo", "path": "../../assets/media/157.jpg", "thumb": "../../assets/media/thumbs/157_480.webp", "size": 140191, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/158.jpg", "thumb": "../../assets/media/thumbs/158_480.webp", "size": 164594, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/159.jpg", "thumb": "../../assets/media/thumbs/159_480.webp", "size": 152807, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-06-03T12:25:05Z", "posts_count": 78, "last_seen_message_id": 159, "stats": {"new": 78, "updated": 39, "media_downloaded": 78}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
