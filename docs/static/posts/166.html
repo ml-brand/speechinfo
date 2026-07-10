@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #166</title>
+  <meta name="description" content=" Voxtral Realtime   Разбираем статью о модели  Voxtral Realtime , в которой предложили ещё один способ, как стримить speech-to-text.  Авторы утверждают, что у них получилось сделать модель, в которой " />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/166.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #166" />
+  <meta property="og:description" content=" Voxtral Realtime   Разбираем статью о модели  Voxtral Realtime , в которой предложили ещё один способ, как стримить speech-to-text.  Авторы утверждают, что у них получилось сделать модель, в которой " />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/166_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-07-10T15:12:25+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/166_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=166" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="166">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-07-10T15:12:25+00:00">2026-07-10 15:12 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Voxtral Realtime<br></strong><br>Разбираем статью о модели <a href="https://arxiv.org/abs/2602.11298v3" rel="nofollow noopener noreferrer">Voxtral Realtime</a>, в которой предложили ещё один способ, как стримить speech-to-text.<br><br>Авторы утверждают, что у них получилось сделать модель, в которой можно контролировать латенси и которая при задержке в полсекунды имеет паритет по качеству с Whisper. Если увеличить задержку до секунды, то модель начинает превосходить Whisper, ещё больше — например, 2,5 секунды, — качество уже сравнивается с офлайновой Voxtral Mini Transcribe V2.<br><br>На <a href="https://huggingface.co/spaces/hf-audio/open_asr_leaderboard" rel="nofollow noopener noreferrer">Open ASR Leaderboard </a>модель занимает место примерно в середине таблицы. Тот же офлайновый Voxtral располагается выше (но он и значительно больше).<br><br>Есть несложный способ превратить модель для офлайн-распознавания в стриминговую: делать инференс по чанкам, то есть разбивать приходящий поток аудио на кусочки фиксированной длины и подавать их в модель. У подхода есть недостатки, которые можно обобщить как мисалайнмент между обучением и инференсом. Чтобы этого избежать, имеет смысл закладывать стриминг уже на этапе обучения.<br><br>Чтобы сделать нативную стриминговую модель, нужно иметь алайнмент между аудио и текстом, а также архитектуру, которая поддерживает постепенную обработку приходящего аудио. Например, распространенный подход — RNN-T со стриминговым энкодером (такой часто используют в Nvidia). Другой, менее известный подход, — DSM (Delayed Streams Modeling). И Voxtral Realtime — это как раз и есть DSM-ка.<br><br>Состоит модель из трёх частей: аудиоэнкодера, адаптера и текстового декодера. Фичи аудио прогоняют через энкодер, потом с помощью адаптера приводят в одно пространство с текстовыми эмбедингами. Они суммируются, подаются на вход в декодер — и предсказывается следующий токен.<br><br>Чуть подробнее о каждой части.<br><br><strong>Трансформер-энкодер</strong> — базовая архитектура с уже привычными RMSNorm, SwiGLU, RoPE и прочим. В качестве аудио фичей, которые подаются на вход, используется log-Mel-спектрограмма. Фичи проходят через две каузальные свертки, что приводит к даунсемплингу в два раза. В итоге энкодер выдаёт фичи каждые 20 миллисекунд. Тут также используется sliding window self-attention с окном в 15 секунд, то есть 750 фреймов.<br><br><strong>Адаптер</strong>, который представляет из себя простой MLP-слой. С помощью него дополнительно даунсемплим аудио ещё в четыре раза. В итоге фичи идут с шагом 80 миллисекунд.<br><br>Т<strong>рансформер-декодер</strong> работает поверх этих фичей и предсказывает следующий токен. <br><br>Из интересного — здесь есть не только текстовые токены, но ещё два служебных: padding [P] (аналог blank-токена в RNN-T) и word [W] (означает, что буквально «сейчас начнётся предсказание слова»). В отличии от RNN-T, где мы можем на один эмбеддинг энкодера предсказать несколько текстовых токенов, здесь предсказываем ровно один токен.<br><br>Чтобы обучать такую модель, авторы собирают данные в виде набора (аудио, текст, word-level алайнмент). Таргеты для обучения на next-token prediction формируются примерно так:<br><br><tg-emoji emoji-id="5289629688224841126">🔴</tg-emoji>На тех фреймах, где произносится слово + некоторый дилэй после конца слова, мы должны предсказать токен [P].<br><tg-emoji emoji-id="5289629688224841126">🔴</tg-emoji>После этого идёт токен [W], за которым следуют токены соответствующего слова.<br><tg-emoji emoji-id="5289629688224841126">🔴</tg-emoji>Всё остальное заполняем токеном [P].<br><br>Одно из нововведений — использование механизма Ada RMS-Norm в декодере — пожалуй, самое интересное в архитектуре. С ним можно во время обучения использовать разную задержку, чтобы модель могла адаптироваться под разную скорость, а во время инференса буквально за счёт изменения одного параметра контролировать то, с какой задержкой ASR выдаёт текст.<br><br>В аблейшенах сравнивают <strong>Ada RMS-Norm</strong> с другими способами контроля латенси, среди которых он показывает лучший результат. Также оказалось полезно не разделять токеном [W] слова, которые произносятся почти одновременно.<br><br><em>Александр Палаевич</em> <tg-emoji emoji-id="5224192932302565805">❣</tg-emoji> <em>Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/166_480.webp" srcset="../../assets/media/thumbs/166_480.webp 480w, ../../assets/media/166.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="166" data-image-index="0" /></div></div>
+      <div class="actions">
+        <span>158 просмотров · 14 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/166" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./166.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./165.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 166, "media": [{"kind": "photo", "path": "../../assets/media/166.jpg", "thumb": "../../assets/media/thumbs/166_480.webp", "size": 48608, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-07-10T16:07:51Z", "posts_count": 84, "last_seen_message_id": 166, "stats": {"new": 79, "updated": 23, "media_downloaded": 79}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
