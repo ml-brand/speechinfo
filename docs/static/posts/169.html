@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #169</title>
+  <meta name="description" content=" Работы о голосовых технологиях на ICML 2026 [2/2]   Продолжаем подборку работ от Максима Борисова. В  первой части  — общие впечатления о конференции и несколько интересных статей.    CoCoEmo: Compos" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/169.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #169" />
+  <meta property="og:description" content=" Работы о голосовых технологиях на ICML 2026 [2/2]   Продолжаем подборку работ от Максима Борисова. В  первой части  — общие впечатления о конференции и несколько интересных статей.    CoCoEmo: Compos" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/169_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-07-17T11:15:06+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/169_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=169" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="169">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-07-17T11:15:06+00:00">2026-07-17 11:15 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Работы о голосовых технологиях на ICML 2026 [2/2]</strong><br><br>Продолжаем подборку работ от Максима Борисова. В <a href="https://t.me/speechinfo/167?single" rel="nofollow noopener noreferrer">первой части</a> — общие впечатления о конференции и несколько интересных статей.<br><br><a href="https://arxiv.org/abs/2602.03420" rel="nofollow noopener noreferrer"><strong>CoCoEmo: Composable and Controllable Emotional TTS via Activation Steering</strong></a><br><br>Эмоция в речи часто состоит из нескольких, порой противоречивых оттенков, которые могут не совпадать с текстом, но TTS обычно навязывают одну эмоцию на всё высказывание, теряя эту вариативность. Activation steering выглядит подходящим инструментом для решения проблемы, но неясно, линейно ли вообще управляются эмоции в TTS, куда именно в гибридной архитектуре подавать steering и как это оценивать.<br><br>Авторы делают первый систематический анализ activation steering для эмоций в гибридных TTS: количественный фреймворк steering и multi-rater-протоколы для composable mixed-emotion и text-emotion mismatch-синтеза. Главный вывод: эмоциональная просодия и выразительность в основном рождаются в language-модуле TTS, а не во flow-matching-модуле — и именно туда нужно подавать steering.<br><br><a href="https://arxiv.org/abs/2601.22661" rel="nofollow noopener noreferrer"><strong>Evaluating and Rewarding LALMs for Expressive Role-Play TTS via MCLP</strong></a><br><br>LALM научились в интерактивный role-play TTS, но плохо держат стилистическую консистентность с профилем персонажа и сценой в multi-turn-диалогах. Ключевая проблема — нет объективных метрик стиля речи.<br><br>Авторы предлагают Mean Continuation Log-Probability (MCLP). Используют in-context learning предобученного LALM и считают правдоподобие ground-truth речевых токенов при условии контекста из транскрипта, сгенерированной речи и повторного транскрипта — это работает как прокси стилистической непрерывности. MCLP хорошо согласуется с человеческими оценками стиля и, что важнее, используется как reward в RL для улучшения RP-TTS. Под задачу собрали большой RP-TTS датасет с богатой разметкой сцен и персонажей; эксперименты дают консистентный прирост и по объективным, и по субъективным метрикам.<br><br><a href="https://arxiv.org/abs/2606.01479" rel="nofollow noopener noreferrer"><strong>Sparse Autoencoders for Interpretable Emotion Control in TTS</strong></a><br><br>Интеграция LLM в TTS улучшила выразительность, но интерпретируемый контроль эмоций всё ещё остается проблемой. Обычно всё сводится к внешнему кондишенингу или глобальному activation steering, из которого непонятно, что происходит внутри. Авторы применяют sparse autoencoders к скрытым состояниям LLM-based TTS и находят разреженные латентные фичи, отвечающие за эмоции.<br><br>Оказалось, что эмоциональная вариация размазана по нескольким sparse-фичам, но воздействовать достаточно на маленькое подмножество. На этом строят точечные вмешательства в отдельные фичи, которые позволяют как усиливать, так и подавлять эмоции — без изменения весов модели. Отдельные латентные фичи связаны с конкретными акустическими параметрами (например, pitch) — то есть эмоция это не единый глобальный сдвиг, а координированный вклад нескольких латентов. По качеству steering сравним или превосходит глобальные подходы и TTS-бейзлайны.<br><br><a href="https://arxiv.org/abs/2605.17583" rel="nofollow noopener noreferrer"><strong>AgentSteerTTS: Multi-Agent Closed-Loop Framework для Composite-Instruction TTS</strong></a><br><br>В TTS сложно управлять составными инструкциями из-за структурного разрыва между текстовыми интентами и непрерывной акустикой. Авторы вдохновляются человеческим когнитивным разделением и делают AgentSteerTTS — мульти-агентную систему с обратной связью.<br><br>Внутри три компонента: 1) adversarial disentanglement agent разделяет identity- и emotion-prosody-подпространства, чтобы убрать утечку спикера в эмоцию; 2) Dual-Stream Anchoring Controller через Retrieval Agent достаёт экспрессивные якоря из большого набора акустических прототипов, а Synthesis Agent сливает их в непрерывные control-векторы через gated attention; 3) Fast-Slow Feedback Agent через latent gradient correction подкручивает интенсивность и через high-level perceptual critique чинит семантико-акустические рассинхроны. На composite-instruction-бенчмарке и публичных тестах стабильно бьёт бейзлайны.<br><br>#YaICML2026<br><br><em>Максим Борисов </em><em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/169_480.webp" srcset="../../assets/media/thumbs/169_480.webp 480w, ../../assets/media/169.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="169" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/170_480.webp" srcset="../../assets/media/thumbs/170_480.webp 480w, ../../assets/media/170.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="169" data-image-index="1" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/171_480.webp" srcset="../../assets/media/thumbs/171_480.webp 480w, ../../assets/media/171.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="169" data-image-index="2" /></div></div>
+      <div class="actions">
+        <span>139 просмотров · 22 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/169" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./169.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./167.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 169, "media": [{"kind": "photo", "path": "../../assets/media/169.jpg", "thumb": "../../assets/media/thumbs/169_480.webp", "size": 262839, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/170.jpg", "thumb": "../../assets/media/thumbs/170_480.webp", "size": 176676, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/171.jpg", "thumb": "../../assets/media/thumbs/171_480.webp", "size": 298947, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-07-17T12:48:47Z", "posts_count": 86, "last_seen_message_id": 171, "stats": {"new": 82, "updated": 43, "media_downloaded": 82}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
