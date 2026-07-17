@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #167</title>
+  <meta name="description" content=" Работы о голосовых технологиях на ICML 2026 [1/2]   С 6 по 11 июля в Сеуле проходила International Conference on Machine Learning, на которой побывал наш коллега Максим Борисов. Он поделился впечатле" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/167.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #167" />
+  <meta property="og:description" content=" Работы о голосовых технологиях на ICML 2026 [1/2]   С 6 по 11 июля в Сеуле проходила International Conference on Machine Learning, на которой побывал наш коллега Максим Борисов. Он поделился впечатле" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/167_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-07-17T09:51:01+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/167_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=167" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="167">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-07-17T09:51:01+00:00">2026-07-17 09:51 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Работы о голосовых технологиях на ICML 2026 [1/2]<br></strong><br>С 6 по 11 июля в Сеуле проходила International Conference on Machine Learning, на которой побывал наш коллега Максим Борисов. Он поделился впечатлениями и подборкой работ на тему Speech.<br><br><blockquote>По спичу представленность была довольно ограниченной — большинство релевантных работ можно было найти на постерах, а не в основных треках и oral-докладах. Зато именно постерные сессии зашли больше всего: можно было час стоять у постера и разбирать детали прямо с авторами — что реально сработало, а что нет, какие были фейлы при воспроизведении, куда двигаться дальше.<br><br>Набрал много полезных идей, которые можно применить в нашей TTS-команде — практически по всему пайплайну: новые подходы к аудиокодекам, идеи для TTS-претрейна, нюансы SFT-стадии (особенно по промптингу), и отдельно интересные вещи по RL для TTS.</blockquote><br><a href="https://arxiv.org/abs/2512.01537" rel="nofollow noopener noreferrer"><strong><br>Two-Dimensional Quantization for Geometry-Aware Audio Coding</strong></a><br><br>В нейронных аудиокодеках квантизацию обычно делают через RVQ, VQ или FSQ. Авторы обращают внимание, что эти схемы жёстко задают геометрию латентного пространства и плохо ловят корреляции между фичами — из-за этого страдает codebook utilization и token rate.<br><br>В Q2D2 фичи проецируют парами на структурированные 2D-сетки (гексагональная, ромбическая, прямоугольная) и квантизуют в ближайший узел сетки. Кодбук получается неявный — как произведение уровней сетки, но по размеру сопоставим с обычными подходами. В итоге у авторов низкий token rate, высокая утилизация кодбука и SOTA-качество реконструкции на speech, audio и music одновременно.<br><br><a href="https://openreview.net/forum?id=icMRkTnuU7" rel="nofollow noopener noreferrer"><strong>Scaling Transformers for End-to-End Discrete Audio Tokenization</strong></a><br><br>Большинство существующих аудиотокенизаторов опираются на предобученные энкодеры, semantic distillation или гетерогенные CNN-архитектуры. Авторы утверждают, что все эти фиксированные inductive biases ограничивают качество реконструкции и мешают нормально масштабироваться.<br><br>Их решение — TAC: полностью end-to-end-трансформерный токенизатор из однородных causal-блоков, где энкодер, квантизатор и декодер учатся с нуля совместно. Получают предсказуемое улучшение с масштабом и обгоняют предыдущие кодеки на широком диапазоне битрейтов. На токенах TAC они собрали первый чисто авторегрессионный TTS, который бьёт non-AR и каскадные системы, и получили конкурентный ASR вообще без вспомогательных энкодеров.<br><br><a href="https://arxiv.org/abs/2606.09962" rel="nofollow noopener noreferrer"><strong>Optimality of FSQ Tokens for Continuous Diffusion for Categorical Data</strong></a><br><br>Continuous diffusion для дискретных данных — альтернатива авторегрессионным LLM. Вопрос в том, какая схема токенизации оптимальна для такой диффузии. Авторы изучают структуру латентного пространства через два свойства: 1) KL-дивергенцию между forward- и reverse-траекториями диффузии, 2) точность предсказания правильного токена оптимально обученной диффузионной моделью.<br><br>Теоретически и на численных экспериментах показывают, что именно FSQ-токены лучше всего ложатся на continuous diffusion. Проверили в TTS: обучили несколько диффузионных TTS с речевыми токенами как промежуточные акустические фичи, и FSQ-вариант обошёл сильный LLM-based-бейзлайн, при этом оказавшись заметно меньше и быстрее.<br><br><a href="https://arxiv.org/abs/2607.02214" rel="nofollow noopener noreferrer"><strong>Unlocking Speech–Text Compositional Powers: Instruction-Following Speech Language Models without Instruction Tuning</strong></a><br><br>Instruction tuning для речевых LLM тяжелее, чем для текстовых: новая модальность, специфичные инструкции для речи и намного более длинные последовательности, чем в тексте. Обычно это решают синтезом огромных речевых претрейн+SFT-датасетов, что плохо масштабируется.<br><br>Авторы предлагают обойтись без instruction tuning вообще. Берут текстовый LLM- претрейн, делают один раунд continual-претрейна на 30k часах речи, а затем просто прибавляют к весам разницу (instruction-tuned text LLM − base text LLM). Такое сложение весов сохраняет знания и умения текстовой модели и переносит их в речевой домен — фактически, это новая парадигма обучения спичёвых LM без гигантских речевых датасетов инструкций.<br><br>Продолжение — во втрой части.<br><br>#YaICML2026<br><br><em>Максим Борисов </em><em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/167_480.webp" srcset="../../assets/media/thumbs/167_480.webp 480w, ../../assets/media/167.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="167" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/168_480.webp" srcset="../../assets/media/thumbs/168_480.webp 480w, ../../assets/media/168.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="167" data-image-index="1" /></div></div>
+      <div class="actions">
+        <span>164 просмотров · 21 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/167" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./167.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./166.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 167, "media": [{"kind": "photo", "path": "../../assets/media/167.jpg", "thumb": "../../assets/media/thumbs/167_480.webp", "size": 231950, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/168.jpg", "thumb": "../../assets/media/thumbs/168_480.webp", "size": 226717, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-07-17T11:09:42Z", "posts_count": 85, "last_seen_message_id": 168, "stats": {"new": 80, "updated": 25, "media_downloaded": 80}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
