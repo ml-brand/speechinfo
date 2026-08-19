@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #177</title>
+  <meta name="description" content=" Как научить машину слышать «естественно»: SpeechJudge [1/2]   Сегодня начинаем разбирать три работы о speech reward models —  SpeechJudge ,  GSRM  и  UniSRM . Все они строят генеративного судью повер" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/177.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #177" />
+  <meta property="og:description" content=" Как научить машину слышать «естественно»: SpeechJudge [1/2]   Сегодня начинаем разбирать три работы о speech reward models —  SpeechJudge ,  GSRM  и  UniSRM . Все они строят генеративного судью повер" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/177_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-08-19T09:29:15+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/177_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=177" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="177">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-08-19T09:29:15+00:00">2026-08-19 09:29 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Как научить машину слышать «естественно»: SpeechJudge [1/2]</strong><br><br>Сегодня начинаем разбирать три работы о speech reward models — <a href="https://arxiv.org/abs/2511.07931" rel="nofollow noopener noreferrer">SpeechJudge</a>, <a href="https://arxiv.org/abs/2602.13891" rel="nofollow noopener noreferrer">GSRM</a> и <a href="https://arxiv.org/abs/2605.23261" rel="nofollow noopener noreferrer">UniSRM</a>. Все они строят генеративного судью поверх Qwen2.5-Omni-7B и дистиллируют ризонинг у более сильной модели. Отличаются тем, что именно чинят — данные, восприятие или награду. SpeechJudge вкладывается в разметку: 99 тысяч пар от живых людей. GSRM меняет вход: рассуждение строится не по самому аудио, а по явно вытащенным DSP-признакам просодии. UniSRM меняет награду: на RL-стадии проверяется не только финальный вердикт, но и оценки по каждому измерению внутри рассуждения.<br><br>Начнём с того, зачем вообще нужна отдельная reward model для речи. Ответ — чтобы нормально заводить RL-алайнмент TTS. Обычные метрики когда-то были неплохим прокси, но постепенно насытились. Низкий WER уже мало говорит о натуральности, ведь если продолжать оптимизировать только его, можно получить очень разборчивую, но роботизированную речь. UTMOS и похожие оценщики тоже возвращают один скаляр, который сложно интерпретировать и легко начать оптимизировать не в ту сторону.<br><br>В базовом сетапе модель генерирует два аудио, человек выбирает лучшее, а reward model учится воспроизводить этот выбор. Скалярному судье можно просто прикрутить линейную голову и обучить по модели Брэдли-Терри. Генеративная модель дополнительно делает ризонинг, объясняя, что происходит с натуральностью, артикуляцией, темпом и просодией, а потом выбирает победителя. Такого судью можно сначала проверить через best-of-N, а затем использовать в DPO или онлайн-GRPO.<br><br><a href="https://arxiv.org/abs/2511.07931" rel="nofollow noopener noreferrer"><strong><u>SpeechJudge</u><br><br></strong></a>Авторы собрали 99 тысяч размеченных людьми пар аудио: шесть zero-shot TTS-моделей трёх архитектур, китайский, английский и code-switching, обычная и выразительная речь.<br><br>Неоднозначные пары отправляли дополнительным асессорам, в среднем получилось 2,49 оценки на пару. Затем отфильтровали спорные примеры и пары, где записи слишком расходились по WER — иначе разница в разборчивости забивает натуральность. Осталось 44 тысячи пар: 42 тысячи для обучения, по тысяче для dev- и SpeechJudge-бенчмарка.<br><br>Лучшим готовым судьёй на этом бенчмарке оказался Gemini 2.5 Flash, поэтому его взяли как учителя. Дальше обучение шло в две стадии. Для 25 тысяч пар, где вердикт Gemini совпал с человеческой меткой, сгенерированные reasoning traces использовали для SFT. Оставшиеся 17 тысяч пар отправили в RL. Правильная человеческая метка выступала verifiable reward, а модель пыталась сама достроить рассуждение, которое к ней приводит.<br><br>Но совпавший финальный ответ ещё не означает, что промежуточное рассуждение корректно. Gemini могла выбрать нужное аудио на мусорном reasoning trace, а затем этот trace попадал в SFT. В следующих работах как раз пытаются отдельно чинить восприятие аудио и проверять качество ризонинга.<br><br>И всё же постобучение помогло. Генеративный SpeechJudge обошёл Gemini 2.5 Flash и скалярный Bradley-Terry-бейзлайн, а голосование по нескольким запускам дало ещё небольшой прирост.<br><br>Авторы этой статьи — единственной из трёх, где судью применили к самой TTS-модели, — проверили, насколько ему можно доверять на практике. В best-of-100 он выбирал лучшее аудио, после чего человек сравнивал его со случайным семплом из той же сотни. Примерно в 30% случаев случайное аудио оказывалось лучше. На отдельном тесте «синтетическая речь против настоящей» SpeechJudge тоже просел: модель обучалась только на синтетических парах и выучила более узкую задачу, а deepfake-детекторы справились лучше.<br><br>То есть SpeechJudge показывает, что генеративную speech reward model действительно можно обучить поверх human preferences. Но хороший результат на собственном бенчмарке ещё не гарантирует, что судья не сломается на новом распределении или внутри RL. В следующей части разберём ещё две статьи о speech reward models.<br><br><em>Василий Ерёмин</em> <tg-emoji emoji-id="5224192932302565805">❣</tg-emoji> <em>Специально для</em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em> <u>Speech Info</u></em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/177_480.webp" srcset="../../assets/media/thumbs/177_480.webp 480w, ../../assets/media/177.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="177" data-image-index="0" /></div></div>
+      <div class="actions">
+        <span>161 просмотров · 15 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/177" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./177.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./176.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 177, "media": [{"kind": "photo", "path": "../../assets/media/177.jpg", "thumb": "../../assets/media/thumbs/177_480.webp", "size": 148429, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-08-19T10:04:07Z", "posts_count": 91, "last_seen_message_id": 177, "stats": {"new": 83, "updated": 42, "media_downloaded": 83}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
