@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #178</title>
+  <meta name="description" content=" Как научить машину слышать «естественно»: GSRM и UniSRM  [2/2]   В   SpeechJudge  , которую мы уже  разобрали  главный риск был в том, что правильный вердикт Gemini ещё не гарантировал нормальный rea" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/178.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #178" />
+  <meta property="og:description" content=" Как научить машину слышать «естественно»: GSRM и UniSRM  [2/2]   В   SpeechJudge  , которую мы уже  разобрали  главный риск был в том, что правильный вердикт Gemini ещё не гарантировал нормальный rea" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/178_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-08-26T12:33:01+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/178_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=178" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="178">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-08-26T12:33:01+00:00">2026-08-26 12:33 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Как научить машину слышать «естественно»: GSRM и UniSRM  [2/2]</strong><br><br>В <a href="https://arxiv.org/abs/2511.07931" rel="nofollow noopener noreferrer"><u>SpeechJudge</u></a>, которую мы уже <a href="https://t.me/speechinfo/177" rel="nofollow noopener noreferrer">разобрали</a> главный риск был в том, что правильный вердикт Gemini ещё не гарантировал нормальный reasoning trace. <a href="https://arxiv.org/abs/2602.13891" rel="nofollow noopener noreferrer"><u>GSRM</u></a> и <a href="https://arxiv.org/abs/2605.23261" rel="nofollow noopener noreferrer"><u>UniSRM</u></a> подходят к проблеме с двух разных сторон. В GSRM считают, что омни-модель по умолчанию плохо извлекает тонкие признаки из сырого аудио. В UniSRM отдельно награждают не только финальный ответ, но и промежуточные оценки внутри рассуждения.<br><br><a href="https://arxiv.org/abs/2602.13891" rel="nofollow noopener noreferrer"><strong><u>GSRM: Generative Speech Reward Model for Speech RLHF</u></strong></a><br><br>Сначала авторы оценили человеческий потолок. Аннотаторов разделили на две группы и посчитали корреляцию между их оценками: Pearson correlation составила всего 0,53.<br><br>Затем попробовали готовые аудиомодели без дообучения. При прямой оценке сырого аудио корреляция была слабоположительной или даже слабоотрицательной. Главный тезис GSRM: проблема не столько в ризонинге, сколько в восприятии. Модель может нормально рассуждать, но сначала ей нужно явно показать, что происходит в аудио.<br><br>Для каждой гласной считают набор DSP-признаков просодии, текстовая модель превращает их в evidence log, увязанный с ground-truth-оценкой. На этих логах учат Qwen2.5-Omni-7B выдавать такие же рассуждения и оценки уже по сырому аудио — DSP нужны только для синтеза обучающих данных.<br><br>На OOD-данных модель даёт PCC 0,465 — около 87% от человеческого потолка; помогает и test-time scaling, насыщение примерно к 16 семплам.<br><br>GSRM проверили и живым reward&#x27;ом: через GRPO на нём дообучили full-duplex speech LLM, она выигрывала у базовой в 82% сравнений по натуральности и в 60–74% по остальным измерениям. Код и модели не открыли.<br><br><a href="https://arxiv.org/abs/2605.23261" rel="nofollow noopener noreferrer"><strong><u>UniSRM: A Unified Speech Reward Model for Reasoning-Based Fine-grained Assessment</u></strong></a><br><br>UniSRM решает четыре задачи: парное сравнение аудио, детальный MOS-скоринг, соответствие речи сценарию и оценку реплики в контексте диалога. Три задачи pairwise, а MOS — pointwise (одно аудио оценивают по семи аспектам от 1 до 5).<br><br>После SFT идёт GRPO с составной наградой, где RCR — reasoning-consistent reward. Награда складывается из трёх частей:<br><br>1) Reward за формат: неправильный формат получает −1, правильный — 0.<br>2) Reward за вердикт: accuracy для pairwise-задач и соответствующая оценка для pointwise.<br>3) Reward за ризонинг: промежуточные оценки по отдельным аспектам сравниваются с эталоном.<br><br>В pairwise-задачах смотрят, на какой доле аспектов знак разницы между двумя аудио совпал с ground truth. В pointwise используют единицу минус среднюю нормированную ошибку по семи аспектам. Если награждать только финальный ответ, модель может угадать его на бессвязном ризонинге. Промежуточные проверки оставляют меньше пространства для такого трюка.<br><br>RCR-GRPO обошёл и чистый SFT, и GRPO с наградой только за вердикт — причём последний местами был хуже SFT. UniSRM сильнее сравниваемых моделей на всех четырёх задачах, но метки ставила LLM, люди верифицировали лишь часть — цифры смещены в её сторону. Внутри онлайн-RL судью не проверяли.<br><br><strong>Что можно забрать из трёх работ</strong><br><br><tg-emoji emoji-id="5289629688224841126">🔴</tg-emoji>Не использовать отдельные WER, UTMOS или speaker similarity как единственного арбитра.<br><tg-emoji emoji-id="5289629688224841126">🔴</tg-emoji>Сначала проверять reward model через best-of-N.<br><tg-emoji emoji-id="5289629688224841126">🔴</tg-emoji>Сначала делать SFT, который учит формат reasoning, и только потом RL на сложных метках.<br>Награждать не только вердикт, но и промежуточные оценки.<br><tg-emoji emoji-id="5289629688224841126">🔴</tg-emoji>Не ждать автоматического переноса на смежную задачу, так как судья тесно связан с данными и сетапом обучения.<br><br>Разметка при этом дорогая: 99 тысяч пар для SpeechJudge собирали два месяца и потратили около 70 тысяч долларов. Это хорошо показывает, какой ценой получают базовый human preference signal.<br><br><em>Василий Ерёмин</em> <tg-emoji emoji-id="5224192932302565805">❣</tg-emoji> <em>Специально для</em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em> <u>Speech Info</u></em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/178_480.webp" srcset="../../assets/media/thumbs/178_480.webp 480w, ../../assets/media/178.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="178" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/179_480.webp" srcset="../../assets/media/thumbs/179_480.webp 480w, ../../assets/media/179.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="178" data-image-index="1" /></div></div>
+      <div class="actions">
+        <span>166 просмотров · 8 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/178" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./178.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./177.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 178, "media": [{"kind": "photo", "path": "../../assets/media/178.jpg", "thumb": "../../assets/media/thumbs/178_480.webp", "size": 109258, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/179.jpg", "thumb": "../../assets/media/thumbs/179_480.webp", "size": 140624, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-08-26T13:40:25Z", "posts_count": 92, "last_seen_message_id": 179, "stats": {"new": 84, "updated": 24, "media_downloaded": 84}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
