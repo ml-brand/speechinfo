@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #184</title>
+  <meta name="description" content=" Compress the Cache, Not the Speech Embedding: KV Compression for Efficient Speech LLMs    Инференс в speech LLM часто обходится дорого — и во многом именно из-за длины аудиопоследовательностей. Разбе" />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/184.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #184" />
+  <meta property="og:description" content=" Compress the Cache, Not the Speech Embedding: KV Compression for Efficient Speech LLMs    Инференс в speech LLM часто обходится дорого — и во многом именно из-за длины аудиопоследовательностей. Разбе" />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/184_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-09-23T11:28:42+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/184_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=184" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="184">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-09-23T11:28:42+00:00">2026-09-23 11:28 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Compress the Cache, Not the Speech Embedding: KV Compression for Efficient Speech LLMs </strong><br><br>Инференс в speech LLM часто обходится дорого — и во многом именно из-за длины аудиопоследовательностей. Разберём <a href="https://arxiv.org/abs/2607.06827" rel="nofollow noopener noreferrer">статью</a>, предлагающую необычное решение этой проблемы.<br><br>Речь устроена более разреженно, чем текст. Так, 10 секунд аудио после speech-энкодера могут превратиться примерно в 125 аудиотокенов, хотя соответствующий текст займёт всего 30–40 токенов — разница примерно в четыре раза. <br><br>На этапе обучения это не критично, но во время авторегрессивного декодинга начинаются сложности. Даже если мы не пересчитываем аттеншн на каждом шаге для всего префикса, а берём сохраненные значения из кеша, каждый новый токен смотрит на все предыдущие keys и values. В результате для каждого нового токена приходится работать с длинной последовательностью аудио.<br><br>Для более эффективной работы мы хотим уменьшить количество speech positions. Делать это можно на разных уровнях. Например, в большинстве современных моделей в энкодере происходит downsampling, а в адаптере несколько соседних эмбеддингов можно объединить в один. Авторы SpeechKV предлагают другой вариант: уменьшать количество speech positions в KV-кеше LLM, сохраняя в энкодере и адаптере как можно больше информации.<br><br>Суть метода: начиная с некоторого слоя LLM авторы объединяют каждые R подряд идущих speech-позиций в KV-кеше с помощью обучаемого пулинга — линейный gate по key-векторам выдаёт softmax-веса внутри окна, и с этими весами усредняются и key-, и value-векторы. Окна не пересекаются, сжатие применяется только к speech-позициям, а текст, query-векторы и residual stream остаются в полном разрешении; при R=4, например, четыре соседних key- и value-вектора превращаются в один.<br><br>В экспериментах авторы взяли Qwen3-1.7B, обучили speech-энкодер, адаптер и LoRA при замороженных остальных весах LLM на 71 тыс. часов открытых ASR-данных. Оценивали модель на OpenASR, in-house ASR-сетах и отдельно — на entity recognition в банковском и медицинском доменах.<br><br>SpeechKV сравнили с бейзлайном без компрессии, с двумя методами, которые делают downsampling речи раньше — на уровне адаптера (Concat-MLP и Window Q-Former), и с альтернативой, сжимающей внутри LLM не KV, а весь hidden state. При R=4 на out-of-domain-сетах компрессия в адаптере просаживает качество, потому что, по предположению авторов, fine-grained-информация теряется слишком рано и LLM не может её восстановить. <br><br>В методе SpeechKV speech positions после сжатия с R=4 по гранулярности становятся ближе к текстовому, размер speech-части KV-кеша сокращаются примерно в 2,8 раза, а decoding в vLLM ускоряется в 1,5–2 раза. Чем длиннее аудио, тем заметнее выигрыш. Увеличение коэффициента сжатия до R=8 почти не даёт дополнительного ускорения: bottleneck постепенно смещается в FFN-слои и текстовую часть KV-кеша.<br><br>Сжимать KV начинают только с пятого слоя, потому что на первых слоях представления соседних speech-позиций сильно различаются, а дальше косинусная близость между ними выходит на плато, так что объединять их можно почти без потери информации. Аблейшены это подтверждают: старт с третьего или седьмого слоя даёт заметно худшие результаты на in-house-сетах.<br><br>Главное ограничение работы — пока неясно, насколько результаты переносятся на более крупные speech LLM, другие архитектуры и задачи за пределами ASR и entity recognition. Эксперименты проведены на небольшой Qwen3-1.7B и на данных, существенно меньших по масштабу, чем те, на которых обучают современные универсальные speech LLM. Поэтому SpeechKV стоит воспринимать не как подтверждённый универсальный рецепт, а как удачную демонстрацию того, что сжимать аудио необязательно на входе в LLM: часть избыточности можно убрать позднее, непосредственно в KV-кеше, сохранив полезные низкоуровневые детали речи.<br><br>Именно это делает направление интересным для дальнейшей проверки на больших моделях. Если эффект сохранится при масштабировании, KV-компрессия может стать относительно простым способом снизить стоимость long-audio inference без заметной деградации качества.<br><br><em>Екатерина Козлова</em> <tg-emoji emoji-id="5224192932302565805">❣</tg-emoji> <em>Специально для</em> <a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em><u>Speech Info</u></em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/184_480.webp" srcset="../../assets/media/thumbs/184_480.webp 480w, ../../assets/media/184.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="184" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/185_480.webp" srcset="../../assets/media/thumbs/185_480.webp 480w, ../../assets/media/185.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="184" data-image-index="1" /></div></div>
+      <div class="actions">
+        <span>159 просмотров · 21 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/184" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./184.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./182.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 184, "media": [{"kind": "photo", "path": "../../assets/media/184.jpg", "thumb": "../../assets/media/thumbs/184_480.webp", "size": 56299, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/185.jpg", "thumb": "../../assets/media/thumbs/185_480.webp", "size": 115408, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-09-23T12:14:31Z", "posts_count": 96, "last_seen_message_id": 185, "stats": {"new": 86, "updated": 19, "media_downloaded": 86}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
