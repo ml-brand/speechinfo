@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #191</title>
+  <meta name="description" content=" Qwen3.5-Omni Technical Report   Сегодня разбираем  техрепорт  Qwen3.5-Omni. Авторы репортят SOTA на множестве задач и рассказывают, что положили в трейн 100 миллионов часов аудиовизуального контента." />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/191.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #191" />
+  <meta property="og:description" content=" Qwen3.5-Omni Technical Report   Сегодня разбираем  техрепорт  Qwen3.5-Omni. Авторы репортят SOTA на множестве задач и рассказывают, что положили в трейн 100 миллионов часов аудиовизуального контента." />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/191_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-10-29T10:35:27+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/191_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=191" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="191">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-10-29T10:35:27+00:00">2026-10-29 10:35 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Qwen3.5-Omni Technical Report<br></strong><br>Сегодня разбираем <a href="https://arxiv.org/abs/2604.15804v2" rel="nofollow noopener noreferrer">техрепорт</a> Qwen3.5-Omni. Авторы репортят SOTA на множестве задач и рассказывают, что положили в трейн 100 миллионов часов аудиовизуального контента. Правда, к сожалению, модели не выложены в опенсорс и доступны только в API. <br><br>По сути, здесь взяли текстовые модели Qwen3.5 и добавили к ним мультимодальные возможности. Начнём с того, чего удалось добиться по сравнению с предыдущей версией Qwen3 Omni, которую мы <a href="https://t.me/speechinfo/93" rel="nofollow noopener noreferrer">разбирали</a> ранее.<br><br><strong>1. Управляемый аудиовизуальный кепшенинг</strong> — модель умеет описывать аудиовизуальную информацию, понимает, что именно хотим узнать о звуковой дорожке или видео. <br><br><strong>2. Хорошее реалтайм-взаимодействие </strong>— понимает структуру диалога, когда пора что-то сказать, когда прерывают. (Деталей реализации в репорте мало — сказано только, что это сделано на RL-стадии). <br><br><strong>3. Способность нативно работать как омнимодальный агент</strong> — тоже получена на стадии RL. <br><br>В плане архитектуры — это по-прежнему <strong>Thinker-Talker</strong>. Thinker — MoE-модель побольше, которая умеет получать информацию из аудио- и картиночного энкодеров и маппить разные модальности в единое эмбеддинговое пространство. Оттуда Talker, MoE-модель поменьше, генерирует текстовые и аудиотокены. <br><br>Для аудио используется 16-уровневый RVQ-кодбук. Сам Talker генерирует только нулевой уровень RVQ, а настроенный поверх него MTP-модуль разворачивает его в остальные 16 уровней кодека.<br><br>Thinker способен работать с последовательностями до 256К токенов. Туда помещается до 10 часов аудио или 400 секунд видео 720p с частотой 1 FPS. Видео при этом представлено отдельно кадрами и отдельно аудио — «честного» видео на вход модель не получает. Поверх конструкции есть декодер, который умеет «разговаривать».<br><br>Несколько интересных технических деталей.<br><br>Во-первых, аудиоэнкодер обучали на ASR-задачах на 40 млн часов аудио. Для длинных аудио и видео одного позиционного эмбеддинга оказалось недостаточно, поэтому в последовательность дополнительно вставляют текстовые временные метки — сколько секунд прошло от начала аудио или видео. Авторы говорят, это заметно улучшает качество на длинных контекстах.<br><br>Во-вторых, для генерации речи добавили <strong>ARIA </strong>(Adaptive Rate Interleave Alignment). При совместной генерации текста и аудио возникает вопрос, сколько аудиотокенов должно приходиться на каждый текстовый токен. Фиксировать это число неудобно: соотношение зависит, например, от языка и токенизаторов. Поэтому в ARIA его определяют отдельно для каждого семпла и при генерации чередуют текстовые и аудиотокены так, чтобы сохранять нужную пропорцию. Так можно собрать оба потока в одну последовательность и при этом сохранить стриминг.<br><br>Ещё одно отличие от предыдущей версии — собственный промпт у Talker. Благодаря ему можно управлять голосом и делать zero-shot voice cloning.<br><br>Что касается обучения, сначала отдельно обучают мультимодальную часть, оставляя текстовую LM замороженной (адаптер, затем энкодеры). После размораживают всю модель и продолжают претрейн уже на 4 трлн токенов.<br><br>На посттрейне отдельно обучают экспертов под выбранные задачи с помощью SFT и RL, а затем дистиллируют их в общую модель. Используют on-policy-дистилляцию, например, для audio-to-text пытаются перенести качество текстового эксперта в мультимодальную модель. На следующей стадии добавляют мультитёрн-диалоги и агентные сценарии, но подробностей этой части в репорте мало.<br><br>Talker обучают отдельно на 20 млн часов речи. Здесь тоже несколько стадий: обучение на мультимодальном контексте, добавление промптов для управления речью, а затем посттрейн с DPO и RL.<br><br>Из практически интересного — Qwen3.5-Omni-Plus показывает лучший результат на русском в ASR-бенчмарке FLEURS среди приведённых в таблице моделей, включая GPT-4o. Так что модель выглядит интересно в том числе как источник синтетической разметки для обучения ASR.<br><br><em>Всеволод Ковшов</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/191_480.webp" srcset="../../assets/media/thumbs/191_480.webp 480w, ../../assets/media/191.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="191" data-image-index="0" /></div></div>
+      <div class="actions">
+        <span>291 просмотров · 14 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/191" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./191.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./188.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 191, "media": [{"kind": "photo", "path": "../../assets/media/191.jpg", "thumb": "../../assets/media/thumbs/191_480.webp", "size": 97528, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-10-29T17:05:14Z", "posts_count": 99, "last_seen_message_id": 191, "stats": {"new": 89, "updated": 52, "media_downloaded": 89}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
