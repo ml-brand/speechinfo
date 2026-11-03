@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #192</title>
+  <meta name="description" content=" Transcription Policy as a Latent Variable: Activating Controllable Verbatim ASR with Word-Level Timing   Разберём  статью  от лаборатории  Nyra Labs . В работе можно выделить три основные части:  1. " />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/192.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #192" />
+  <meta property="og:description" content=" Transcription Policy as a Latent Variable: Activating Controllable Verbatim ASR with Word-Level Timing   Разберём  статью  от лаборатории  Nyra Labs . В работе можно выделить три основные части:  1. " />
+  <meta property="og:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/192_480.webp" />
+  <meta property="og:image:alt" content="Speech Info" />
+  <meta property="article:published_time" content="2026-11-03T14:38:01+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://ml-brand.github.io/speechinfo/assets/media/thumbs/192_480.webp" />
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=192" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="192">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-11-03T14:38:01+00:00">2026-11-03 14:38 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Transcription Policy as a Latent Variable: Activating Controllable Verbatim ASR with Word-Level Timing</strong><br><br>Разберём <a href="https://arxiv.org/abs/2607.18934" rel="nofollow noopener noreferrer">статью</a> от лаборатории <a href="https://nyra-labs.com/" rel="nofollow noopener noreferrer">Nyra Labs</a>. В работе можно выделить три основные части:<br><br>1. Как заставить ASR выбирать нужный стиль транскрипции.<br><br>2. Как получить word-level alignment из cross-attention.<br><br>3. Как восстановить verbatim-транскрипцию по аудио и хорошей intended-транскрипции, не испортив исходный текст.<br><br>Остановимся на первом пункте.<br><br><strong>Verbatim</strong> в рамках работы — транскрипция, которая сохраняет междометия, обрывы слов, повторы и неречевые события: смех, кашель.<br><br><strong>Intended</strong> — более чистая транскрипция, близкая к привычной разметке в опенсорсных датасетах. В ней удаляются повторы и недоговоренные слова, не предсказываются неречевые теги.<br><br>Главную гипотезу формулируют так: <code>Model already knew. It just couldn&#x27;t be asked</code>. То есть ASR уже умел выдавать транскрипции в разных стилях, но не было интерфейса для выбора нужного режима.<br><br><strong>Decoding instability</strong><br><strong><br></strong>Если запустить обычный Whisper с beam search и посмотреть на несколько гипотез для одного аудио, они могут заметно различаться по CER и стилю.<br><br>Одна гипотеза сохраняет междометия и повторы, другая удаляет их, третья иначе оформляет обрывы слов. При этом разные гипотезы могут выбирать разные transcription policies. Получается, что decoding uncertainty связана не только с акустикой, но и с неопределённостью стиля предсказания.<br><br><strong>Mode tags<br></strong><br>В качестве решения добавляют три группы управляющих тегов:<br><br><code>sound</code> — кашель, смех и другие неречевые события;<br><br><code>verbatim</code> — междометия, обрывы слов и повторы;<br><br><code>intended</code> — чистая транскрипция.<br><br>Причём используется не один бинарный переключатель verbatim / intended, а несколько тегов разной интенсивности. Благодаря этому отдельными компонентами transcription policy можно управлять независимо, например, сохранять дисфлюенции, но не выводить неречевые события.<br><br><strong>Training fraction</strong><br><strong><br></strong>Чтобы проверить эффективность тегов, авторы меняли долю verbatim-примеров в обучающей выборке.<br><br>Без тегов модель стабильно предсказывала verbatim только при высокой доле таких данных. В промежуточной зоне она смешивала разные стили транскрипции.<br><br>С тегами качество оставалось высоким даже при небольшой доле verbatim-данных. Модель получала явный сигнал о том, какую policy нужно использовать, и переставала угадывать её по особенностям датасета.<br><br><strong>Основной эксперимент<br></strong><br>Базовый Whisper получил около 10% F1 при распознавании немецких дисфлюенций.<br>Затем авторы заморозили все 764 млн параметров модели и обучили только десять новых эмбеддингов для тегов. Уже этого оказалось достаточно, чтобы повысить F1 до 79%.<br><br>После разморозили декодер и провели небольшое дообучение, в результате чего F1 вырос до 94%. При этом немецких verbatim-данных в fine-tuning не использовали.<br><br>Десять новых эмбеддингов едва ли могли с нуля научить 764-миллионную модель распознавать немецкие междометия, повторы и обрывы слов. Более вероятно, что соответствующая способность уже присутствовала во внутренних представлениях Whisper, а теги лишь предоставили к ней удобный интерфейс.<br><br><strong>Что ещё есть в статье<br></strong><br>Вторая часть работы — о том, как делают алайнмент через cross-attention. Оказалось,  некоторые головы у Whisper уже содержат информацию, где в аудио находится слово. Авторы берут несколько таких голов, усредняют их и дообучают на алайнмент MFA. В итоге получают рабочий алайнер.<br><br>Третья часть работы — задача Verbatimize: на вход подаются аудио и intended-транскрипция, а модель восстанавливает verbatim, добавляя в акустически обоснованных местах повторы, междометия, обрывы слов и неречевые теги. На ICSI rare-word set recall редких слов вырос с 6,8% (без промптирования) до 94,1%, а с casing perturbation — до 96,1%.<br><br><strong>Результат<br></strong><br>Главный результат выглядит убедительно: ASR уже умеет работать в разных стилях, а mode tags делают выбор управляемым. Обучение всего десяти эмбеддингов повышает German disfluency F1 с 10% до 79% без немецких verbatim-данных в обучении. При этом перенос показан только на немецком — нужны дополнительные эксперименты на других языках и моделях.<br><br><em>Иван Бобошко</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a><div class="media"><img class="media-img" loading="lazy" src="../../assets/media/thumbs/192_480.webp" srcset="../../assets/media/thumbs/192_480.webp 480w, ../../assets/media/192.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="192" data-image-index="0" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/193_480.webp" srcset="../../assets/media/thumbs/193_480.webp 480w, ../../assets/media/193.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="192" data-image-index="1" /><img class="media-img" loading="lazy" src="../../assets/media/thumbs/194_480.webp" srcset="../../assets/media/thumbs/194_480.webp 480w, ../../assets/media/194.jpg 1200w" sizes="(max-width: 768px) 100vw, 800px" alt="" data-post-id="192" data-image-index="2" /></div></div>
+      <div class="actions">
+        <span>152 просмотров · 11 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/192" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./192.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./191.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 192, "media": [{"kind": "photo", "path": "../../assets/media/192.jpg", "thumb": "../../assets/media/thumbs/192_480.webp", "size": 67970, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/193.jpg", "thumb": "../../assets/media/thumbs/193_480.webp", "size": 126092, "mime": "image/jpeg", "name": null}, {"kind": "photo", "path": "../../assets/media/194.jpg", "thumb": "../../assets/media/thumbs/194_480.webp", "size": 101203, "mime": "image/jpeg", "name": null}]}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-11-03T15:29:03Z", "posts_count": 100, "last_seen_message_id": 194, "stats": {"new": 91, "updated": 22, "media_downloaded": 91}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
