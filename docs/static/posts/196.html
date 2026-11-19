@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Speech Info — пост #196</title>
+  <meta name="description" content=" Qwen-Audio-3.0-TTS: Freely Controllable and Highly Robust Speech Synthesis with Multi-Stage Training Paradigm [2/2]   В  первой части  разобрали архитектуру Qwen-Audio-3.0-TTS. Теперь посмотрим, как " />
+  <link rel="icon" href="../../favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32.png" />
+  <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+  <link rel="canonical" href="https://ml-brand.github.io/speechinfo/static/posts/196.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Speech Info — пост #196" />
+  <meta property="og:description" content=" Qwen-Audio-3.0-TTS: Freely Controllable and Highly Robust Speech Synthesis with Multi-Stage Training Paradigm [2/2]   В  первой части  разобрали архитектуру Qwen-Audio-3.0-TTS. Теперь посмотрим, как " />
+  
+  <meta property="article:published_time" content="2026-11-19T11:14:46+00:00" />
+  <meta property="article:author" content="Speech Info" />
+  <meta name="twitter:card" content="summary" />
+  
+  <link rel="stylesheet" href="../../style.css" />
+  <script src="../../metrika.js"></script>
+</head>
+<body data-index-href="../index.html">
+  <header class="header">
+    <div class="container">
+      <div class="title-grid single-title">
+        <a class="grid-avatar" href="#" target="_blank" rel="noopener">
+          <img id="channelAvatar" class="channel-avatar" src="../../assets/channel_avatar.jpg" alt="Аватар канала"  />
+        </a>
+        <div class="grid-main">
+          <div class="title-head">
+            <a class="back-link" href="../index.html">← Ко всем постам</a>
+            <a class="badge-chip" id="siteTitleWrap" href="#" target="_blank" rel="noopener"><h1 id="siteTitle">Speech Info</h1></a>
+            <div class="hero-actions">
+              <a id="subscribeBtn" class="subscribe-btn" href="https://t.me/+0VCG1pUgLahlZGNi" target="_blank" rel="noopener" >Подписаться</a>
+              <a class="icon-btn" href="../../post.html?id=196" aria-label="Открыть динамическую страницу поста">↺</a>
+              <button id="themeToggle" class="icon-btn" type="button" aria-label="Переключить тему"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  
+  <div id="promoBanner" class="promo-banner" hidden>
+    <div class="container promo-inner">
+      <span class="promo-text"><a href="https://t.me/addlist/5NH3RoVejEI1MGEy">Подпишись на все наши ML каналы. Они классные, отвечаем!</a></span>
+      <button id="promoClose" class="promo-close" type="button" aria-label="Скрыть плашку">×</button>
+    </div>
+  </div>
+  
+
+  <main class="container single-page">
+    <article id="postContainer" class="post post-page" data-post-id="196">
+      <div class="post-header">
+        <div class="right"><span class="post-date" data-iso-date="2026-11-19T11:14:46+00:00">2026-11-19 11:14 UTC</span></div>
+      </div>
+      <div class="post-body"><strong>Qwen-Audio-3.0-TTS: Freely Controllable and Highly Robust Speech Synthesis with Multi-Stage Training Paradigm [2/2]</strong><br><br>В <a href="https://t.me/speechinfo/195" rel="nofollow noopener noreferrer">первой части</a> разобрали архитектуру Qwen-Audio-3.0-TTS. Теперь посмотрим, как модель обучают. <br><br><strong>1) Раздельный претрейн LM и flow matching</strong><br><br>Начинают с рецепта CosyVoice2 и CosyVoice3: LM учится предсказывать семантические токены по тексту и контексту промпта, FM параллельно учится восстанавливать мел-спектрограмму по токенам.<br><br><strong>2) Joint training</strong><br><br>Теперь на вход FM подают hidden states языковой модели. Через них градиент от flow-matching loss проходит обратно в LM, и обе части обучаются совместно. При этом сохраняется cross-entropy loss на предсказание токенов.<br><br>Сначала модели обучают на широком миксе данных, чтобы согласовать работу на разных языках, голосах и стилях. Затем делают high-quality data annealing.<br><br><strong>3) RL для языковой модели<br></strong><br>Дальше оптимизируют LM через GRPO. В composite reward входят content consistency по ASR, штраф за выбросы по длительности, generation diversity и prosodic naturalness с учётом alignment progression и таймингов пауз. Всё это оценивают по токенам без декодирования аудио.<br><br>К GRPO добавляют DiffRO, дифференцируемый метод на основе Gumbel-Softmax. Он позволяет пропустить градиент от reward модели через предсказания токенов обратно в LM. Получается сочетание sequence-level GRPO и token-level DiffRO сигналов.<br><br>Сам RL тоже разбит на две фазы. Сначала оптимизируют общую генерацию, исключив instruction-following, fine-grained-control и диалектные примеры. Затем переходят к multi-task alignment и добавляют reward за корректность диалекта.<br><br><strong>4) Robustness training на шумных промптах<br></strong><br>На этом этапе LM замораживают, а FM учат работать с деградированными аудиопромптами. Для этого используют шум, реверберацию, артефакты кодеков и другие искажения. По такому референсу FM должна сгенерировать чистую речь, сохранив тембр спикера.<br><br><strong>5) RL для flow matching<br></strong><br>На последнем этапе оптимизируют уже сам акустический декодер через FlowTTS-GRPO.<br><br>Для сравнения, у языковой модели на каждом шаге есть распределение вероятностей следующего токена. У FM следующий шаг ODE-семплинга задаётся предсказанным velocity field. Начальный шум случайный, но после фиксации текущего состояния переход в следующее детерминирован. А для GRPO нужен probability ratio, то есть отношение плотностей одного и того же перехода под текущей и старой моделями. Поэтому ODE-семплер переводят в SDE, добавляя гауссовский шум и поправку к drift. Последняя сохраняет маргинальные распределения исходного flow в непрерывном времени, а у переходов появляется плотность, по которой можно считать log-prob и нужный ratio. SDE используют только на ранних шагах, дальше идут по ODE. Для reward используют speaker similarity, ASR intelligibility и DNSMOS.<br><br>Итого имеем улучшенную версию CosyVoice3 на стероидах: пять этапов обучения и первое место англоязычной Artificial Analysis TTS Arena в июле. Но интереснее потестировать самому в QwenCloud, насколько красивые цифры бенчмарков соответствуют реальному качеству.<br><br><em>Владимир Гогорян</em> <em><tg-emoji emoji-id="5224192932302565805">❣</tg-emoji></em><em> Специально для </em><a href="https://t.me/speechinfo" rel="nofollow noopener noreferrer"><em>Speech Info</em></a></div>
+      <div class="actions">
+        <span>187 просмотров · 8 реакций</span>
+        <span class="action-links"><a href="https://t.me/speechinfo/196" target="_blank" rel="noopener">Открыть в Telegram</a> · <a href="../index.html">К списку постов</a> · <a href="./196.html">Ссылка на этот пост</a></span>
+      </div>
+    </article>
+
+    <div class="pager single-nav">
+      <a id="prevPost" class="nav-link disabled" href="#" style="visibility:hidden">← Более новый</a>
+      <a id="nextPost" class="nav-link" href="./195.html" style="visibility:visible">Более старый →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span>based on <a href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">tg-to-gh-pages</a> (created by <a href="https://github.com/ml-brand" target="_blank" rel="noopener">ML Brand</a>)</span>
+        <a id="repoLink" href="https://github.com/ml-brand/tg-to-gh-pages" target="_blank" rel="noopener">Do the same with your channel.</a>
+        <span class="footer-links">
+          static copy ·
+          <a href="../../feed.xml" target="_blank" rel="noopener">RSS</a> ·
+          <a href="../../atom.xml" target="_blank" rel="noopener">Atom</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.__STATIC_POSTS = [{"id": 196, "media": []}];
+    window.__STATIC_META = {"title": "Speech Info", "username": "speechinfo", "channel": "speechinfo", "last_sync_utc": "2026-11-19T12:10:39Z", "posts_count": 102, "last_seen_message_id": 196, "stats": {"new": 91, "updated": 28, "media_downloaded": 90}, "avatar": "assets/channel_avatar.jpg", "meta_schema_version": "1.0.0", "posts_schema_version": "1.0.0"};
+  </script>
+  <script src="../../common.js"></script>
+  <script src="../../static.js"></script>
+</body>
+</html>
